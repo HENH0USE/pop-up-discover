@@ -1,0 +1,152 @@
+/* ============================================================
+   Forms — inputs, selects, switches, labels
+   ============================================================ */
+
+.nb-label {
+  display: block;
+  font-size: 0.72rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  margin-bottom: 0.35rem;
+}
+.nb-input,
+.nb-textarea,
+.nb-select-trigger {
+  width: 100%;
+  font-family: inherit;
+  font-size: 0.9rem;
+  color: var(--ink);
+  background: var(--paper-2);
+  border: var(--border-w) solid var(--ink);
+  padding: 0.55rem 0.7rem;
+}
+.nb-input:focus,
+.nb-textarea:focus,
+.nb-select-trigger:focus,
+.nb-input:focus-visible,
+.nb-select-trigger:focus-visible {
+  outline: 3px solid var(--accent);
+  outline-offset: 0;
+}
+.nb-input::placeholder,
+.nb-textarea::placeholder {
+  color: var(--muted);
+}
+.nb-textarea {
+  resize: vertical;
+  min-height: 80px;
+}
+.nb-input--with-icon {
+  padding-left: 2.2rem;
+}
+.nb-field-icon {
+  position: absolute;
+  left: 0.6rem;
+  top: 50%;
+  transform: translateY(-50%);
+  color: var(--ink);
+  pointer-events: none;
+}
+
+.nb-select-trigger {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.5rem;
+  cursor: pointer;
+  text-align: left;
+}
+.nb-select-content {
+  background: var(--paper-2);
+  border: var(--border-w) solid var(--ink);
+  box-shadow: var(--shadow-sm);
+  z-index: 60;
+  overflow: hidden;
+  max-height: 280px;
+}
+.nb-select-viewport {
+  padding: 0.25rem;
+}
+.nb-select-item {
+  display: flex;
+  align-items: center;
+  padding: 0.45rem 0.6rem;
+  font-size: 0.88rem;
+  cursor: pointer;
+  user-select: none;
+  outline: none;
+}
+.nb-select-item[data-highlighted] {
+  background: var(--accent);
+}
+.nb-select-scroll {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 22px;
+  cursor: default;
+}
+
+/* native select used on the home filter */
+.nb-native-select {
+  font-family: inherit;
+  font-size: 0.9rem;
+  background: var(--paper-2);
+  color: var(--ink);
+  border: var(--border-w) solid var(--ink);
+  padding: 0.55rem 0.7rem;
+  cursor: pointer;
+}
+
+/* ---------- Switch ---------- */
+.nb-switch {
+  position: relative;
+  width: 52px;
+  height: 28px;
+  flex-shrink: 0;
+  background: var(--paper-2);
+  border: var(--border-w) solid var(--ink);
+  cursor: pointer;
+  padding: 0;
+}
+.nb-switch[data-state="checked"] {
+  background: var(--open);
+}
+.nb-switch__thumb {
+  display: block;
+  width: 18px;
+  height: 18px;
+  background: var(--ink);
+  transform: translateX(2px);
+  transition: transform 0.12s ease;
+}
+.nb-switch[data-state="checked"] .nb-switch__thumb {
+  background: var(--paper-2);
+  transform: translateX(26px);
+}
+
+/* ---------- Image upload ---------- */
+.nb-upload {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  flex-wrap: wrap;
+}
+.nb-upload__preview {
+  width: 96px;
+  height: 96px;
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--paper-2);
+  border: var(--border-w) solid var(--ink);
+  overflow: hidden;
+}
+.nb-upload__preview img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
