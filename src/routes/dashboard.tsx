@@ -28,7 +28,7 @@ import {
   Clock,
   DollarSign,
   Utensils,
-  Truck,
+  Store,
   Save,
   Share2,
   Copy,
@@ -40,8 +40,6 @@ import { ImageUpload } from "@/components/ImageUpload";
 
 const DAYS = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"];
 
-type CuisineType = Database["public"]["Enums"]["cuisine_type"];
-
 type SocialLink = { label: string; url: string };
 
 function parseSocialLinks(value: unknown): SocialLink[] {
@@ -52,13 +50,7 @@ function parseSocialLinks(value: unknown): SocialLink[] {
   );
 }
 
-const CUISINE_TYPES: CuisineType[] = [
-  "Tacos", "Burgers", "Pizza", "BBQ", "Sandwiches", "Dessert", "Ice Cream",
-  "Asian Fusion", "Thai", "Chinese", "Japanese", "Indian", "Mediterranean",
-  "Middle Eastern", "Vegan", "Breakfast", "Coffee", "Smoothies", "Other",
-];
-
-type FoodTruckRow = Database["public"]["Tables"]["food_trucks"]["Row"];
+type PopupRow = Database["public"]["Tables"]["food_trucks"]["Row"];
 
 export const Route = createFileRoute("/dashboard")({
   component: DashboardPage,
@@ -82,22 +74,21 @@ function DashboardPage() {
 }
 
 function DashboardContent() {
-  const { data: truck, isLoading } = useQuery({
-    queryKey: ["my-truck"],
+  const { data: popup, isLoading } = useQuery({
+    queryKey: ["my-popup"],
     queryFn: () => getMyTruck(),
   });
 
   if (isLoading) return <Loader />;
-  if (!truck) return <CreateTruckForm />;
-  return <ManageTruck truck={truck} />;
+  if (!popup) return <CreatePopupForm />;
+  return <ManagePopup popup={popup} />;
 }
 
-function CreateTruckForm() {
+function CreatePopupForm() {
   const queryClient = useQueryClient();
   const { user } = useAuth();
   const [name, setName] = useState("");
   const [description, setDescription] = useState("");
-  const [cuisineType, setCuisineType] = useState<CuisineType>("Tacos");
   const [spotPhoto, setSpotPhoto] = useState<string | null>(null);
   const [menuPhoto, setMenuPhoto] = useState<string | null>(null);
   const [address, setAddress] = useState("");
@@ -106,13 +97,12 @@ function CreateTruckForm() {
     mutationFn: async (payload: {
       name: string;
       description: string;
-      cuisine_type: CuisineType;
       spot_photo_url: string;
       menu_photo_url: string;
       current_location_address: string;
     }) => createFoodTruck({ data: payload }),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["my-truck"] });
+      queryClient.invalidateQueries({ queryKey: ["my-popup"] });
     },
   });
 
@@ -121,7 +111,6 @@ function CreateTruckForm() {
     createMutation.mutate({
       name,
       description,
-      cuisine_type: cuisineType,
       spot_photo_url: spotPhoto ?? "",
       menu_photo_url: menuPhoto ?? "",
       current_location_address: address,
@@ -133,16 +122,16 @@ function CreateTruckForm() {
       <Card>
         <CardHeader>
           <CardTitle>
-            <Truck size={20} style={{ color: "var(--accent)" }} />
-            Create Your Food Truck
+            <Store size={20} style={{ color: "var(--accent)" }} />
+            Create Your Pop-Up
           </CardTitle>
         </CardHeader>
         <CardContent>
           <form onSubmit={handleSubmit} className="stack-sm">
             <div>
-              <Label htmlFor="truck-name">Truck Name</Label>
+              <Label htmlFor="popup-name">Pop-Up Name</Label>
               <Input
-                id="truck-name"
+                id="popup-name"
                 value={name}
                 onChange={(e) => setName(e.target.value)}
                 placeholder="e.g. Tasty Tacos"
@@ -150,27 +139,12 @@ function CreateTruckForm() {
               />
             </div>
             <div>
-              <Label htmlFor="truck-cuisine">Cuisine Type</Label>
-              <Select value={cuisineType} onValueChange={(v) => setCuisineType(v as CuisineType)}>
-                <SelectTrigger>
-                  <SelectValue />
-                </SelectTrigger>
-                <SelectContent>
-                  {CUISINE_TYPES.map((c) => (
-                    <SelectItem key={c} value={c}>
-                      {c}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-            </div>
-            <div>
-              <Label htmlFor="truck-desc">Description</Label>
+              <Label htmlFor="popup-desc">Description</Label>
               <Textarea
-                id="truck-desc"
+                id="popup-desc"
                 value={description}
                 onChange={(e) => setDescription(e.target.value)}
-                placeholder="Tell customers about your truck..."
+                placeholder="Tell customers about your pop-up..."
                 rows={3}
               />
             </div>
@@ -181,7 +155,7 @@ function CreateTruckForm() {
                   value={spotPhoto}
                   onChange={setSpotPhoto}
                   label="Photo of the Spot"
-                  hint="A picture of where your truck is parked."
+                  hint="A picture of where your pop-up is set up."
                 />
                 <ImageUpload
                   userId={user.id}
@@ -193,9 +167,9 @@ function CreateTruckForm() {
               </>
             )}
             <div>
-              <Label htmlFor="truck-address">Current Location Address</Label>
+              <Label htmlFor="popup-address">Current Location Address</Label>
               <Input
-                id="truck-address"
+                id="popup-address"
                 value={address}
                 onChange={(e) => setAddress(e.target.value)}
                 placeholder="123 Main St, City, State"
@@ -203,7 +177,7 @@ function CreateTruckForm() {
             </div>
             <Button type="submit" className="nb-btn--block" disabled={createMutation.isPending}>
               {createMutation.isPending ? <Loader2 size={16} className="spin" /> : <Plus size={16} />}
-              Create Truck
+              Create Pop-Up
             </Button>
           </form>
         </CardContent>
@@ -212,17 +186,16 @@ function CreateTruckForm() {
   );
 }
 
-function ShareTruck({ truck }: { truck: FoodTruckRow }) {
+function SharePopup({ popup }: { popup: PopupRow }) {
   const [copied, setCopied] = useState(false);
   const origin = typeof window !== "undefined" ? window.location.origin : "";
-  const slug = (truck as { slug?: string | null }).slug;
-  const shareUrl = slug ? `${origin}/t/${slug}` : `${origin}/map?truck=${truck.id}`;
-  
+  const slug = (popup as { slug?: string | null }).slug;
+  const shareUrl = slug ? `${origin}/p/${slug}` : `${origin}/map?popup=${popup.id}`;
 
   const ready =
-    !!truck.spot_photo_url &&
-    !!truck.menu_photo_url &&
-    !!truck.current_location_address;
+    !!popup.spot_photo_url &&
+    !!popup.menu_photo_url &&
+    !!popup.current_location_address;
 
   const copy = async () => {
     try {
@@ -234,14 +207,12 @@ function ShareTruck({ truck }: { truck: FoodTruckRow }) {
     }
   };
 
-
-
   return (
     <Card className="mb-4">
       <CardHeader>
         <CardTitle>
           <Share2 size={20} style={{ color: "var(--accent)" }} />
-          Share Your Truck
+          Share Your Pop-Up
         </CardTitle>
       </CardHeader>
       <CardContent>
@@ -252,7 +223,7 @@ function ShareTruck({ truck }: { truck: FoodTruckRow }) {
         )}
         <div className="nb-share">
           <p style={{ fontSize: "0.9rem" }}>
-            This link opens the map focused on your truck with all your info.
+            This link opens the map focused on your pop-up with all your info.
           </p>
           <div className="nb-share__row">
             <span className="nb-share__link">{shareUrl}</span>
@@ -267,15 +238,15 @@ function ShareTruck({ truck }: { truck: FoodTruckRow }) {
   );
 }
 
-function ManageTruck({ truck }: { truck: FoodTruckRow }) {
+function ManagePopup({ popup }: { popup: PopupRow }) {
   return (
     <div className="page container" style={{ paddingTop: "2rem", paddingBottom: "3rem" }}>
       <div className="mb-4">
-        <h1>{truck.name}</h1>
-        <p className="muted">Manage your truck profile, menu, and schedule.</p>
+        <h1>{popup.name}</h1>
+        <p className="muted">Manage your pop-up profile, menu, and schedule.</p>
       </div>
 
-      <ShareTruck truck={truck} />
+      <SharePopup popup={popup} />
 
       <Tabs defaultValue="profile">
         <TabsList className="mb-4">
@@ -285,15 +256,15 @@ function ManageTruck({ truck }: { truck: FoodTruckRow }) {
         </TabsList>
 
         <TabsContent value="profile">
-          <TruckProfileForm truck={truck} />
+          <PopupProfileForm popup={popup} />
         </TabsContent>
 
         <TabsContent value="menu">
-          <MenuManager truckId={truck.id} />
+          <MenuManager popupId={popup.id} />
         </TabsContent>
 
         <TabsContent value="schedule">
-          <ScheduleManager truckId={truck.id} />
+          <ScheduleManager popupId={popup.id} />
         </TabsContent>
       </Tabs>
     </div>
@@ -327,7 +298,7 @@ function SocialLinksEditor({
             <Input
               value={s.url}
               onChange={(e) => update(i, { url: e.target.value })}
-              placeholder="https://instagram.com/yourtruck"
+              placeholder="https://instagram.com/yourpopup"
               className="flex-1"
             />
             <Button variant="ghost" size="icon" className="nb-btn--danger" onClick={() => remove(i)}>
@@ -344,19 +315,17 @@ function SocialLinksEditor({
   );
 }
 
-
-function TruckProfileForm({ truck }: { truck: FoodTruckRow }) {
+function PopupProfileForm({ popup }: { popup: PopupRow }) {
   const queryClient = useQueryClient();
   const { user } = useAuth();
-  const [name, setName] = useState(truck.name);
-  const [description, setDescription] = useState(truck.description || "");
-  const [cuisineType, setCuisineType] = useState<CuisineType>(truck.cuisine_type);
-  const [spotPhoto, setSpotPhoto] = useState<string | null>(truck.spot_photo_url);
-  const [menuPhoto, setMenuPhoto] = useState<string | null>(truck.menu_photo_url);
-  const [address, setAddress] = useState(truck.current_location_address || "");
-  const [isOpen, setIsOpen] = useState(truck.is_open_now);
+  const [name, setName] = useState(popup.name);
+  const [description, setDescription] = useState(popup.description || "");
+  const [spotPhoto, setSpotPhoto] = useState<string | null>(popup.spot_photo_url);
+  const [menuPhoto, setMenuPhoto] = useState<string | null>(popup.menu_photo_url);
+  const [address, setAddress] = useState(popup.current_location_address || "");
+  const [isOpen, setIsOpen] = useState(popup.is_open_now);
   const [socialLinks, setSocialLinks] = useState<SocialLink[]>(
-    parseSocialLinks((truck as { social_links?: unknown }).social_links)
+    parseSocialLinks((popup as { social_links?: unknown }).social_links)
   );
 
   const updateMutation = useMutation({
@@ -364,22 +333,20 @@ function TruckProfileForm({ truck }: { truck: FoodTruckRow }) {
       id: string;
       name: string;
       description: string;
-      cuisine_type: CuisineType;
       spot_photo_url: string | null;
       menu_photo_url: string | null;
       social_links: SocialLink[];
       current_location_address: string;
       is_open_now: boolean;
     }) => updateFoodTruck({ data: payload }),
-    onSuccess: () => queryClient.invalidateQueries({ queryKey: ["my-truck"] }),
+    onSuccess: () => queryClient.invalidateQueries({ queryKey: ["my-popup"] }),
   });
 
   const handleSave = () => {
     updateMutation.mutate({
-      id: truck.id,
+      id: popup.id,
       name,
       description,
-      cuisine_type: cuisineType,
       spot_photo_url: spotPhoto,
       menu_photo_url: menuPhoto,
       social_links: socialLinks.filter((s) => s.label.trim() && s.url.trim()),
@@ -391,29 +358,12 @@ function TruckProfileForm({ truck }: { truck: FoodTruckRow }) {
   return (
     <Card>
       <CardHeader>
-        <CardTitle>Truck Profile</CardTitle>
+        <CardTitle>Pop-Up Profile</CardTitle>
       </CardHeader>
       <CardContent className="stack-sm">
-        <div className="grid-two">
-          <div>
-            <Label>Name</Label>
-            <Input value={name} onChange={(e) => setName(e.target.value)} />
-          </div>
-          <div>
-            <Label>Cuisine</Label>
-            <Select value={cuisineType} onValueChange={(v) => setCuisineType(v as CuisineType)}>
-              <SelectTrigger>
-                <SelectValue />
-              </SelectTrigger>
-              <SelectContent>
-                {CUISINE_TYPES.map((c) => (
-                  <SelectItem key={c} value={c}>
-                    {c}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-          </div>
+        <div>
+          <Label>Name</Label>
+          <Input value={name} onChange={(e) => setName(e.target.value)} />
         </div>
         <div>
           <Label>Description</Label>
@@ -426,7 +376,7 @@ function TruckProfileForm({ truck }: { truck: FoodTruckRow }) {
               value={spotPhoto}
               onChange={setSpotPhoto}
               label="Photo of the Spot"
-              hint="Where your truck is parked."
+              hint="Where your pop-up is set up."
             />
             <ImageUpload
               userId={user.id}
@@ -440,10 +390,10 @@ function TruckProfileForm({ truck }: { truck: FoodTruckRow }) {
         <div>
           <Label>Current Location Address</Label>
           <Input value={address} onChange={(e) => setAddress(e.target.value)} />
-          {!truck.current_latitude && !truck.current_longitude && (
+          {!popup.current_latitude && !popup.current_longitude && (
             <p className="flex items-center gap-1 mt-1" style={{ fontSize: "0.8rem", color: "var(--accent)" }}>
               <AlertCircle size={14} />
-              Save your address to place your truck on the map.
+              Save your address to place your pop-up on the map.
             </p>
           )}
         </div>
@@ -461,11 +411,11 @@ function TruckProfileForm({ truck }: { truck: FoodTruckRow }) {
   );
 }
 
-function MenuManager({ truckId }: { truckId: string }) {
+function MenuManager({ popupId }: { popupId: string }) {
   const queryClient = useQueryClient();
   const { data, isLoading } = useQuery({
-    queryKey: ["food-truck", truckId],
-    queryFn: () => getFoodTruck({ data: { id: truckId } }),
+    queryKey: ["pop-up", popupId],
+    queryFn: () => getFoodTruck({ data: { id: popupId } }),
   });
 
   const [name, setName] = useState("");
@@ -480,7 +430,7 @@ function MenuManager({ truckId }: { truckId: string }) {
       price: number;
     }) => createMenuItem({ data: payload }),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["food-truck", truckId] });
+      queryClient.invalidateQueries({ queryKey: ["pop-up", popupId] });
       setName("");
       setDesc("");
       setPrice("");
@@ -489,7 +439,7 @@ function MenuManager({ truckId }: { truckId: string }) {
 
   const deleteMutation = useMutation({
     mutationFn: async (payload: { id: string }) => deleteMenuItem({ data: payload }),
-    onSuccess: () => queryClient.invalidateQueries({ queryKey: ["food-truck", truckId] }),
+    onSuccess: () => queryClient.invalidateQueries({ queryKey: ["pop-up", popupId] }),
   });
 
   const handleAdd = (e: React.FormEvent) => {
@@ -497,7 +447,7 @@ function MenuManager({ truckId }: { truckId: string }) {
     const numPrice = parseFloat(price);
     if (!name || Number.isNaN(numPrice) || numPrice <= 0) return;
     createMutation.mutate({
-      truck_id: truckId,
+      truck_id: popupId,
       name,
       description: desc,
       price: numPrice,
@@ -583,11 +533,11 @@ function MenuManager({ truckId }: { truckId: string }) {
   );
 }
 
-function ScheduleManager({ truckId }: { truckId: string }) {
+function ScheduleManager({ popupId }: { popupId: string }) {
   const queryClient = useQueryClient();
   const { data, isLoading } = useQuery({
-    queryKey: ["food-truck", truckId],
-    queryFn: () => getFoodTruck({ data: { id: truckId } }),
+    queryKey: ["pop-up", popupId],
+    queryFn: () => getFoodTruck({ data: { id: popupId } }),
   });
 
   const [day, setDay] = useState(1);
@@ -606,7 +556,7 @@ function ScheduleManager({ truckId }: { truckId: string }) {
       location_address: string;
     }) => createSchedule({ data: payload }),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["food-truck", truckId] });
+      queryClient.invalidateQueries({ queryKey: ["pop-up", popupId] });
       setDay(1);
       setStart("09:00");
       setEnd("17:00");
@@ -617,13 +567,13 @@ function ScheduleManager({ truckId }: { truckId: string }) {
 
   const deleteMutation = useMutation({
     mutationFn: async (payload: { id: string }) => deleteSchedule({ data: payload }),
-    onSuccess: () => queryClient.invalidateQueries({ queryKey: ["food-truck", truckId] }),
+    onSuccess: () => queryClient.invalidateQueries({ queryKey: ["pop-up", popupId] }),
   });
 
   const handleAdd = (e: React.FormEvent) => {
     e.preventDefault();
     createMutation.mutate({
-      truck_id: truckId,
+      truck_id: popupId,
       day_of_week: day,
       start_time: start,
       end_time: end,
