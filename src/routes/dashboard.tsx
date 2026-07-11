@@ -73,13 +73,9 @@ function DashboardPage() {
   return (
     <>
       {!user && <GuestBanner />}
-      <fieldset
-        disabled={!user}
-        aria-disabled={!user}
-        style={{ border: "none", padding: 0, margin: 0, minWidth: 0 }}
-      >
+      <div className={!user ? "dashboard-guest" : undefined} aria-disabled={!user || undefined}>
         {user ? <DashboardContent /> : <GuestDashboardPreview />}
-      </fieldset>
+      </div>
     </>
   );
 }
