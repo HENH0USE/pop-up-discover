@@ -23,20 +23,37 @@ type PhotoFields = {
   menu_photo_url: string | null;
 };
 
-// Replace stored storage paths with public URLs for display.
-// The `truck-photos` bucket is public, so no signing / service-role key is needed.
+// Replace stored storage paths with temporary signed URLs for display.
+// A public SELECT policy on the truck-photos bucket lets the anon client
+// sign URLs without a service-role key.
 async function withSignedPhotos<T extends PhotoFields>(trucks: T[]): Promise<T[]> {
+  const paths = new Set<string>();
+  for (const t of trucks) {
+    if (t.spot_photo_url && !/^https?:\/\//i.test(t.spot_photo_url)) paths.add(t.spot_photo_url);
+    if (t.menu_photo_url && !/^https?:\/\//i.test(t.menu_photo_url)) paths.add(t.menu_photo_url);
+  }
+  if (paths.size === 0) return trucks;
+
   const supabase = createPublicClient();
-  const toUrl = (path: string | null): string | null => {
-    if (!path) return null;
-    if (/^https?:\/\//i.test(path)) return path;
-    const { data } = supabase.storage.from("truck-photos").getPublicUrl(path);
-    return data.publicUrl ?? null;
+  const { data } = await supabase.storage
+    .from("truck-photos")
+    .createSignedUrls(Array.from(paths), 3600);
+
+  const map = new Map<string, string>();
+  for (const item of data ?? []) {
+    if (item.signedUrl && item.path) map.set(item.path, item.signedUrl);
+  }
+
+  const resolve = (p: string | null): string | null => {
+    if (!p) return null;
+    if (/^https?:\/\//i.test(p)) return p;
+    return map.get(p) ?? null;
   };
+
   return trucks.map((t) => ({
     ...t,
-    spot_photo_url: toUrl(t.spot_photo_url),
-    menu_photo_url: toUrl(t.menu_photo_url),
+    spot_photo_url: resolve(t.spot_photo_url),
+    menu_photo_url: resolve(t.menu_photo_url),
   }));
 }
 
