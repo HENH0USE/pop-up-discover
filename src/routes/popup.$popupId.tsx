@@ -10,24 +10,24 @@ import type { Database } from "@/integrations/supabase/types";
 type FoodTruck = Database["public"]["Tables"]["food_trucks"]["Row"];
 type MenuItem = Database["public"]["Tables"]["menu_items"]["Row"];
 type Schedule = Database["public"]["Tables"]["schedules"]["Row"];
-type TruckDetail = { truck: FoodTruck; menuItems: MenuItem[]; schedules: Schedule[] };
+type PopupDetail = { truck: FoodTruck; menuItems: MenuItem[]; schedules: Schedule[] };
 
 export const Route = createFileRoute("/popup/$popupId")({
-  component: TruckDetailPage,
+  component: PopupDetailPage,
   loader: async ({ params }) => {
-    const truck = await getFoodTruck({ data: { id: params.truckId } });
+    const truck = await getFoodTruck({ data: { id: params.popupId } });
     return { truck };
   },
 });
 
-function TruckDetailPage() {
-  const { truckId } = Route.useParams();
+function PopupDetailPage() {
+  const { popupId } = Route.useParams();
   const loaderData = Route.useLoaderData();
 
-  const { data, isLoading } = useQuery<TruckDetail>({
-    queryKey: ["food-truck", truckId],
-    queryFn: () => getFoodTruck({ data: { id: truckId } }) as Promise<TruckDetail>,
-    initialData: loaderData?.truck as TruckDetail | undefined,
+  const { data, isLoading } = useQuery<PopupDetail>({
+    queryKey: ["food-truck", popupId],
+    queryFn: () => getFoodTruck({ data: { id: popupId } }) as Promise<PopupDetail>,
+    initialData: loaderData?.truck as PopupDetail | undefined,
   });
 
   if (isLoading || !data) {
@@ -50,7 +50,7 @@ function TruckDetailPage() {
         <div className="container">
           <Link to="/" className="nb-btn nb-btn--ghost nb-btn--sm">
             <ArrowLeft size={16} />
-            Back to Trucks
+            Back to Pop-Ups
           </Link>
         </div>
       </div>
