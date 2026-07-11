@@ -15,10 +15,9 @@ export const Route = createFileRoute("/")({
 
 const RADIUS_MILES = 5;
 
-type Truck = Awaited<ReturnType<typeof getFoodTrucks>>[number];
-type Located = Truck & { current_latitude: number; current_longitude: number };
+type Popup = Awaited<ReturnType<typeof getFoodTrucks>>[number];
+type Located = Popup & { current_latitude: number; current_longitude: number };
 
-// Great-circle distance in miles
 function distanceMiles(aLat: number, aLng: number, bLat: number, bLng: number) {
   const toRad = (d: number) => (d * Math.PI) / 180;
   const R = 3958.8;
@@ -39,8 +38,8 @@ function HomePage() {
   const [geoError, setGeoError] = useState<string | null>(null);
   const [searching, setSearching] = useState(false);
 
-  const { data: trucks } = useQuery({
-    queryKey: ["food-trucks"],
+  const { data: popups } = useQuery({
+    queryKey: ["pop-ups"],
     queryFn: () => getFoodTrucks(),
   });
 
@@ -50,14 +49,14 @@ function HomePage() {
   const markersRef = useRef<google.maps.Marker[]>([]);
   const infoRef = useRef<google.maps.InfoWindow | null>(null);
 
-  const located = (trucks ?? []).filter(
+  const located = (popups ?? []).filter(
     (t): t is Located => t.current_latitude != null && t.current_longitude != null
   );
 
   const nearby = center
     ? located
         .map((t) => ({
-          truck: t,
+          popup: t,
           dist: distanceMiles(center.lat, center.lng, t.current_latitude, t.current_longitude),
         }))
         .filter((x) => x.dist <= RADIUS_MILES)
@@ -86,7 +85,6 @@ function HomePage() {
     }
   }
 
-  // Initialize map once loaded
   useEffect(() => {
     if (!maps || !mapEl.current || mapRef.current) return;
     mapRef.current = new maps.maps.Map(mapEl.current, {
@@ -99,7 +97,6 @@ function HomePage() {
     infoRef.current = new maps.maps.InfoWindow();
   }, [maps]);
 
-  // Render markers whenever center or trucks change
   useEffect(() => {
     if (!maps || !mapRef.current || !center) return;
     markersRef.current.forEach((m) => m.setMap(null));
@@ -107,7 +104,6 @@ function HomePage() {
 
     const bounds = new maps.maps.LatLngBounds();
 
-    // Center marker for the searched area
     const centerPos = { lat: center.lat, lng: center.lng };
     const centerMarker = new maps.maps.Marker({
       position: centerPos,
@@ -125,33 +121,32 @@ function HomePage() {
     markersRef.current.push(centerMarker);
     bounds.extend(centerPos);
 
-    nearby.forEach(({ truck, dist }) => {
-      const position = { lat: truck.current_latitude, lng: truck.current_longitude };
+    nearby.forEach(({ popup, dist }) => {
+      const position = { lat: popup.current_latitude, lng: popup.current_longitude };
       const marker = new maps.maps.Marker({
         position,
         map: mapRef.current!,
-        title: truck.name,
+        title: popup.name,
         icon: {
           path: maps.maps.SymbolPath.CIRCLE,
           scale: 9,
-          fillColor: truck.is_open_now ? "#16a34a" : "#64748b",
+          fillColor: popup.is_open_now ? "#16a34a" : "#64748b",
           fillOpacity: 1,
           strokeColor: "#ffffff",
           strokeWeight: 2,
         },
       });
       marker.addListener("click", () => {
-        // Open trucks: go straight to the full truck profile
-        if (truck.is_open_now) {
-          navigate({ to: "/truck/$truckId", params: { truckId: truck.id } });
+        if (popup.is_open_now) {
+          navigate({ to: "/popup/$popupId", params: { popupId: popup.id } });
           return;
         }
         if (!infoRef.current) return;
         infoRef.current.setContent(
-          `<div style="min-width:170px"><div style="font-weight:700;margin-bottom:2px">${truck.name}</div>` +
-            `<div style="font-size:12px;color:#64748b">${truck.cuisine_type} &middot; ${dist.toFixed(1)} mi</div>` +
-            `<div style="font-size:12px;margin-top:4px;color:${truck.is_open_now ? "#16a34a" : "#64748b"}">${truck.is_open_now ? "Open now" : "Closed"}</div>` +
-            `<a href="/truck/${truck.id}" style="font-size:12px;color:#d97706;display:inline-block;margin-top:6px">View details &rarr;</a></div>`
+          `<div style="min-width:170px"><div style="font-weight:700;margin-bottom:2px">${popup.name}</div>` +
+            `<div style="font-size:12px;color:#64748b">${dist.toFixed(1)} mi</div>` +
+            `<div style="font-size:12px;margin-top:4px;color:${popup.is_open_now ? "#16a34a" : "#64748b"}">${popup.is_open_now ? "Open now" : "Closed"}</div>` +
+            `<a href="/popup/${popup.id}" style="font-size:12px;color:#d97706;display:inline-block;margin-top:6px">View details &rarr;</a></div>`
         );
         infoRef.current.open(mapRef.current!, marker);
       });
@@ -165,7 +160,7 @@ function HomePage() {
       mapRef.current.setCenter(centerPos);
       mapRef.current.setZoom(12);
     }
-  }, [maps, center, nearby]);
+  }, [maps, center, nearby, navigate]);
 
   return (
     <div className="page">
@@ -185,7 +180,7 @@ function HomePage() {
         <Card className="nb-card">
           <CardContent className="text-center" style={{ padding: "2.5rem 1.5rem" }}>
             <h2 style={{ fontSize: "1.4rem", textTransform: "uppercase", letterSpacing: "0.02em", marginBottom: "0.75rem" }}>
-              Your Pop-up Card
+              Your Pop-Up Card
             </h2>
             <p className="muted" style={{ maxWidth: 640, margin: "0 auto", lineHeight: 1.5 }}>
               Create a shareable card link with your info, menu and live location on google maps so customers can find you instantly.
@@ -216,7 +211,7 @@ function HomePage() {
                   <MapPin size={32} style={{ margin: "0 auto 0.5rem" }} />
                   <p style={{ fontWeight: 700 }}>Enter your area code to start</p>
                   <p style={{ fontSize: "0.9rem" }}>
-                    We'll show every Pop-up around your community.
+                    We'll show every Pop-Up around your community.
                   </p>
                 </div>
               </div>
@@ -228,9 +223,7 @@ function HomePage() {
       <section className="nb-hero" style={{ padding: "3rem 1rem" }}>
         <div className="text-center">
           <h1>Find local vendors support your community</h1>
-          <p className="nb-hero__lead">
-            Pop in your area code
-          </p>
+          <p className="nb-hero__lead">Pop in your area code</p>
 
           <form className="nb-search-row" onSubmit={handleSearch}>
             <div className="relative flex-1">
@@ -262,17 +255,17 @@ function HomePage() {
             <div className="flex items-center gap-1 mb-2">
               <Navigation size={20} style={{ color: "var(--accent)" }} />
               <h2 className="section-title">
-                {nearby.length} truck{nearby.length === 1 ? "" : "s"} within {RADIUS_MILES} mi
+                {nearby.length} pop-up{nearby.length === 1 ? "" : "s"} within {RADIUS_MILES} mi
               </h2>
             </div>
             {nearby.length === 0 ? (
               <p className="muted text-center" style={{ padding: "2rem 0" }}>
-                No trucks are near {center.address} right now. Try another area code.
+                No pop-ups are near {center.address} right now. Try another area code.
               </p>
             ) : (
               <div className="grid-cards">
-                {nearby.map(({ truck, dist }) => (
-                  <TruckCard key={truck.id} truck={truck} dist={dist} />
+                {nearby.map(({ popup, dist }) => (
+                  <PopupCard key={popup.id} popup={popup} dist={dist} />
                 ))}
               </div>
             )}
@@ -283,14 +276,13 @@ function HomePage() {
   );
 }
 
-function TruckCard({
-  truck,
+function PopupCard({
+  popup,
   dist,
 }: {
-  truck: {
+  popup: {
     id: string;
     name: string;
-    cuisine_type: string;
     spot_photo_url: string | null;
     description: string | null;
     current_location_address: string | null;
@@ -299,38 +291,37 @@ function TruckCard({
   dist: number;
 }) {
   return (
-    <Link to="/truck/$truckId" params={{ truckId: truck.id }}>
+    <Link to="/popup/$popupId" params={{ popupId: popup.id }}>
       <Card className="nb-card--link" style={{ overflow: "hidden" }}>
         <div className="media-box relative">
-          {truck.spot_photo_url ? (
-            <img src={truck.spot_photo_url} alt={truck.name} loading="lazy" />
+          {popup.spot_photo_url ? (
+            <img src={popup.spot_photo_url} alt={popup.name} loading="lazy" />
           ) : (
             <MapPin size={32} />
           )}
           <Badge
-            variant={truck.is_open_now ? "open" : "closed"}
+            variant={popup.is_open_now ? "open" : "closed"}
             style={{ position: "absolute", top: 8, right: 8 }}
           >
-            {truck.is_open_now ? "Open Now" : "Closed"}
+            {popup.is_open_now ? "Open Now" : "Closed"}
           </Badge>
         </div>
         <CardContent>
           <div className="flex items-start justify-between gap-1 mb-1">
-            <h3 style={{ fontSize: "1.1rem" }}>{truck.name}</h3>
+            <h3 style={{ fontSize: "1.1rem" }}>{popup.name}</h3>
             <Badge variant="secondary" className="shrink-0">
               {dist.toFixed(1)} mi
             </Badge>
           </div>
-          <p className="muted" style={{ fontSize: "0.8rem" }}>{truck.cuisine_type}</p>
-          {truck.current_location_address && (
+          {popup.current_location_address && (
             <p className="muted flex items-center gap-1 mt-1" style={{ fontSize: "0.85rem" }}>
               <MapPin size={14} />
-              {truck.current_location_address}
+              {popup.current_location_address}
             </p>
           )}
-          {truck.description && (
+          {popup.description && (
             <p className="muted clamp-2 mt-1" style={{ fontSize: "0.85rem" }}>
-              {truck.description}
+              {popup.description}
             </p>
           )}
         </CardContent>
@@ -338,5 +329,3 @@ function TruckCard({
     </Link>
   );
 }
-
-
