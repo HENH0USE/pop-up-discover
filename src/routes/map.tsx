@@ -9,16 +9,16 @@ import { Loader2, MapPin, Navigation, AlertCircle, List, ExternalLink, X } from 
 import { useEffect, useRef, useState } from "react";
 
 export const Route = createFileRoute("/map")({
-  validateSearch: (search: Record<string, unknown>): { truck?: string } => ({
-    truck: typeof search.truck === "string" ? search.truck : undefined,
+  validateSearch: (search: Record<string, unknown>): { popup?: string } => ({
+    popup: typeof search.popup === "string" ? search.popup : undefined,
   }),
   component: MapPage,
 });
 
-type Truck = Awaited<ReturnType<typeof getFoodTrucks>>[number];
+type Popup = Awaited<ReturnType<typeof getFoodTrucks>>[number];
 
 function MapPage() {
-  const { truck: focusId } = Route.useSearch();
+  const { popup: focusId } = Route.useSearch();
   const [openOnly, setOpenOnly] = useState(false);
   const { maps, isLoaded, error } = useGoogleMaps();
   const mapEl = useRef<HTMLDivElement>(null);
@@ -27,25 +27,23 @@ function MapPage() {
   const infoRef = useRef<google.maps.InfoWindow | null>(null);
   const navigate = useNavigate();
 
-  const { data: trucks, isLoading } = useQuery({
-    queryKey: ["food-trucks"],
+  const { data: popups, isLoading } = useQuery({
+    queryKey: ["pop-ups"],
     queryFn: () => getFoodTrucks(),
   });
 
-  // Detailed info for a shared/focused vendor
   const { data: focused } = useQuery({
-    queryKey: ["food-truck", focusId],
+    queryKey: ["pop-up", focusId],
     queryFn: () => getFoodTruck({ data: { id: focusId! } }),
     enabled: !!focusId,
   });
 
-  const located = (trucks ?? []).filter(
-    (t): t is Truck & { current_latitude: number; current_longitude: number } =>
+  const located = (popups ?? []).filter(
+    (t): t is Popup & { current_latitude: number; current_longitude: number } =>
       t.current_latitude != null && t.current_longitude != null
   );
   const visible = openOnly ? located.filter((t) => t.is_open_now) : located;
 
-  // Initialize the map once
   useEffect(() => {
     if (!maps || !mapEl.current || mapRef.current) return;
     mapRef.current = new maps.maps.Map(mapEl.current, {
@@ -58,7 +56,6 @@ function MapPage() {
     infoRef.current = new maps.maps.InfoWindow();
   }, [maps]);
 
-  // Render markers when data or filter changes
   useEffect(() => {
     if (!maps || !mapRef.current) return;
     markersRef.current.forEach((m) => m.setMap(null));
@@ -67,21 +64,21 @@ function MapPage() {
     if (visible.length === 0) return;
     const bounds = new maps.maps.LatLngBounds();
 
-    visible.forEach((truck) => {
+    visible.forEach((popup) => {
       const position = {
-        lat: truck.current_latitude,
-        lng: truck.current_longitude,
+        lat: popup.current_latitude,
+        lng: popup.current_longitude,
       };
-      const isFocus = truck.id === focusId;
+      const isFocus = popup.id === focusId;
       const marker = new maps.maps.Marker({
         position,
         map: mapRef.current!,
-        title: truck.name,
+        title: popup.name,
         zIndex: isFocus ? 999 : undefined,
         icon: {
           path: maps.maps.SymbolPath.CIRCLE,
           scale: isFocus ? 13 : 9,
-          fillColor: truck.is_open_now ? "#16a34a" : "#64748b",
+          fillColor: popup.is_open_now ? "#16a34a" : "#64748b",
           fillOpacity: 1,
           strokeColor: isFocus ? "#d97706" : "#ffffff",
           strokeWeight: isFocus ? 4 : 2,
@@ -90,10 +87,9 @@ function MapPage() {
       marker.addListener("click", () => {
         if (!infoRef.current) return;
         infoRef.current.setContent(
-          `<div style="min-width:160px"><div style="font-weight:700;margin-bottom:2px">${truck.name}</div>` +
-            `<div style="font-size:12px;color:#64748b">${truck.cuisine_type}</div>` +
-            `<div style="font-size:12px;margin-top:4px;color:${truck.is_open_now ? "#16a34a" : "#64748b"}">${truck.is_open_now ? "Open now" : "Closed"}</div>` +
-            `<a href="/truck/${truck.id}" style="font-size:12px;color:#d97706;display:inline-block;margin-top:6px">View details &rarr;</a></div>`
+          `<div style="min-width:160px"><div style="font-weight:700;margin-bottom:2px">${popup.name}</div>` +
+            `<div style="font-size:12px;margin-top:4px;color:${popup.is_open_now ? "#16a34a" : "#64748b"}">${popup.is_open_now ? "Open now" : "Closed"}</div>` +
+            `<a href="/popup/${popup.id}" style="font-size:12px;color:#d97706;display:inline-block;margin-top:6px">View details &rarr;</a></div>`
         );
         infoRef.current.open(mapRef.current!, marker);
       });
@@ -101,12 +97,11 @@ function MapPage() {
       bounds.extend(position);
     });
 
-    // Focus a shared truck if present and located
-    const focusTruck = focusId ? visible.find((t) => t.id === focusId) : undefined;
-    if (focusTruck) {
+    const focusPopup = focusId ? visible.find((t) => t.id === focusId) : undefined;
+    if (focusPopup) {
       mapRef.current.setCenter({
-        lat: focusTruck.current_latitude,
-        lng: focusTruck.current_longitude,
+        lat: focusPopup.current_latitude,
+        lng: focusPopup.current_longitude,
       });
       mapRef.current.setZoom(15);
     } else if (visible.length === 1) {
@@ -124,10 +119,10 @@ function MapPage() {
           <div>
             <h1 className="flex items-center gap-1" style={{ fontSize: "1.75rem" }}>
               <Navigation size={24} style={{ color: "var(--accent)" }} />
-              Truck Map
+              Pop-Up Map
             </h1>
             <p className="muted" style={{ fontSize: "0.9rem" }}>
-              See where trucks are right now and which are open.
+              See where pop-ups are right now and which are open.
             </p>
           </div>
           <div className="flex items-center gap-1">
@@ -159,9 +154,8 @@ function MapPage() {
                       <Badge variant={focused.truck.is_open_now ? "open" : "closed"}>
                         {focused.truck.is_open_now ? "Open Now" : "Closed"}
                       </Badge>
-                      <Badge variant="secondary">{focused.truck.cuisine_type}</Badge>
                     </div>
-                    <Link to="/map" search={{ truck: undefined }}>
+                    <Link to="/map" search={{ popup: undefined }}>
                       <Button variant="ghost" size="icon" aria-label="Clear selection">
                         <X size={16} />
                       </Button>
@@ -179,7 +173,7 @@ function MapPage() {
                     </p>
                   )}
 
-                  <Link to="/truck/$truckId" params={{ truckId: focused.truck.id }}>
+                  <Link to="/popup/$popupId" params={{ popupId: focused.truck.id }}>
                     <Button variant="outline" size="sm">
                       View full details
                       <ExternalLink size={14} />
@@ -191,7 +185,7 @@ function MapPage() {
                   <div className="detail-top__media">
                     <img
                       src={focused.truck.spot_photo_url}
-                      alt={`Where ${focused.truck.name} is parked`}
+                      alt={`Where ${focused.truck.name} is located`}
                       className="detail-img"
                     />
                   </div>
@@ -222,11 +216,11 @@ function MapPage() {
               <div className="map-overlay" style={{ pointerEvents: "none" }}>
                 <div className="text-center muted" style={{ padding: "0 1rem" }}>
                   <MapPin size={32} style={{ margin: "0 auto 0.5rem" }} />
-                  <p style={{ fontWeight: 700 }}>No trucks to show on the map</p>
+                  <p style={{ fontWeight: 700 }}>No pop-ups to show on the map</p>
                   <p style={{ fontSize: "0.9rem" }}>
                     {openOnly
-                      ? "No open trucks have shared a location yet."
-                      : "Trucks need a current location to appear here."}
+                      ? "No open pop-ups have shared a location yet."
+                      : "Pop-ups need a current location to appear here."}
                   </p>
                 </div>
               </div>
@@ -236,21 +230,20 @@ function MapPage() {
 
         {visible.length > 0 && (
           <div className="grid-cards" style={{ marginTop: "1.5rem" }}>
-            {visible.map((truck) => (
-              <Link key={truck.id} to="/map" search={{ truck: truck.id }}>
-                <Card className={`nb-card--link${truck.id === focusId ? " nb-card--selected" : ""}`}>
+            {visible.map((popup) => (
+              <Link key={popup.id} to="/map" search={{ popup: popup.id }}>
+                <Card className={`nb-card--link${popup.id === focusId ? " nb-card--selected" : ""}`}>
                   <CardContent>
                     <div className="flex items-start justify-between gap-1">
-                      <h3 style={{ fontSize: "1.05rem" }}>{truck.name}</h3>
-                      <Badge variant={truck.is_open_now ? "open" : "closed"} className="shrink-0">
-                        {truck.is_open_now ? "Open" : "Closed"}
+                      <h3 style={{ fontSize: "1.05rem" }}>{popup.name}</h3>
+                      <Badge variant={popup.is_open_now ? "open" : "closed"} className="shrink-0">
+                        {popup.is_open_now ? "Open" : "Closed"}
                       </Badge>
                     </div>
-                    <p className="muted mt-1" style={{ fontSize: "0.85rem" }}>{truck.cuisine_type}</p>
-                    {truck.current_location_address && (
+                    {popup.current_location_address && (
                       <p className="muted flex items-center gap-1 mt-1" style={{ fontSize: "0.85rem" }}>
                         <MapPin size={14} className="shrink-0" />
-                        {truck.current_location_address}
+                        {popup.current_location_address}
                       </p>
                     )}
                   </CardContent>
