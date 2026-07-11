@@ -3,7 +3,8 @@ import { useEffect, useState } from "react";
 // Loose typing for the Google Maps global; the real types come from @types/google.maps
 // at runtime once the script has loaded. We keep this file typecheck-clean without
 // depending on the ambient `google` namespace being resolved.
-type GoogleGlobal = { maps: unknown } & Record<string, unknown>;
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+type GoogleGlobal = { maps: any } & Record<string, any>;
 
 declare global {
   interface Window {
