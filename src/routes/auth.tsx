@@ -7,7 +7,7 @@ import { Label } from "@/components/ui/label";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Store, AlertCircle } from "lucide-react";
-import { createLovableAuth } from "@lovable.dev/cloud-auth-js";
+import { lovable } from "@/integrations/lovable";
 
 export const Route = createFileRoute("/auth")({
   component: AuthPage,
@@ -55,34 +55,16 @@ function AuthPage() {
     setError("");
     setLoading(true);
     try {
-      const lovableAuth = createLovableAuth();
-      const result = await lovableAuth.signInWithOAuth("google", {
-        redirect_uri: `${window.location.origin}/auth`,
+      const result = await lovable.auth.signInWithOAuth("google", {
+        redirect_uri: window.location.origin,
       });
-
       if (result.error) {
         setError(result.error.message);
         setLoading(false);
         return;
       }
-
-      if (result.redirected) {
-        // Wait for redirect back
-        return;
-      }
-
-      if (result.tokens) {
-        const { error: sessionError } = await supabase.auth.setSession({
-          access_token: result.tokens.access_token,
-          refresh_token: result.tokens.refresh_token,
-        });
-        if (sessionError) {
-          setError(sessionError.message);
-          setLoading(false);
-          return;
-        }
-        window.location.href = "/";
-      }
+      if (result.redirected) return;
+      window.location.href = "/";
     } catch (err) {
       setError(err instanceof Error ? err.message : "Something went wrong");
       setLoading(false);
