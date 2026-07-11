@@ -1,0 +1,132 @@
+/* ============================================================
+   Page-specific blocks — hero, media, detail, schedule, map
+   ============================================================ */
+
+/* ---------- Hero ---------- */
+.nb-hero {
+  background: var(--cyan);
+  border-bottom: var(--border-w) solid var(--ink);
+  
+  padding: 3rem 0;
+}
+.nb-hero h1 {
+  font-size: clamp(2rem, 6vw, 3.4rem);
+}
+.nb-hero__lead {
+  max-width: 540px;
+  margin: 1rem auto 1.75rem;
+  font-size: 1.05rem;
+}
+.nb-search-row {
+  display: flex;
+  gap: 0.75rem;
+  max-width: 640px;
+  margin: 0 auto;
+}
+
+/* ---------- Media ---------- */
+.media-box {
+  aspect-ratio: 16 / 9;
+  background: repeating-linear-gradient(
+    45deg,
+    #e7e3d8,
+    #e7e3d8 10px,
+    #ddd9cd 10px,
+    #ddd9cd 20px
+  );
+  border-bottom: var(--border-w) solid var(--ink);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--muted);
+  overflow: hidden;
+}
+.media-box img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+.media-box--framed {
+  border: var(--border-w) solid var(--ink);
+}
+
+/* ---------- Detail page ---------- */
+.detail-top {
+  display: flex;
+  gap: 1.5rem;
+}
+.detail-top__main {
+  flex: 2;
+}
+.detail-top__media {
+  flex: 1;
+}
+.detail-img {
+  width: 100%;
+  aspect-ratio: 16 / 9;
+  object-fit: cover;
+  border: var(--border-w) solid var(--ink);
+  box-shadow: var(--shadow-sm);
+}
+
+/* ---------- Schedule rows ---------- */
+.day-row {
+  display: flex;
+  gap: 1rem;
+  padding: 0.6rem 0;
+  border-bottom: 2px solid var(--ink);
+}
+.day-row:last-child {
+  border-bottom: none;
+}
+.day-name {
+  width: 120px;
+  flex-shrink: 0;
+  font-weight: 700;
+  text-transform: uppercase;
+  font-size: 0.8rem;
+}
+.sched-row {
+  display: flex;
+  gap: 1rem;
+  padding: 0.6rem 0;
+  border-bottom: 2px solid var(--ink);
+}
+.sched-row:last-child {
+  border-bottom: none;
+}
+.sched-row__day {
+  width: 110px;
+  flex-shrink: 0;
+  font-weight: 700;
+  text-transform: uppercase;
+  font-size: 0.8rem;
+}
+
+/* ---------- Map ---------- */
+.map-canvas {
+  height: 40vh;
+  width: 100%;
+  background: var(--paper);
+}
+.map-overlay {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--cyan);
+}
+
+/* ---------- Detail page responsive ---------- */
+@media (max-width: 640px) {
+  .nb-search-row {
+    flex-direction: column;
+  }
+}
+
+@media (max-width: 720px) {
+  .detail-top {
+    flex-direction: column;
+  }
+}

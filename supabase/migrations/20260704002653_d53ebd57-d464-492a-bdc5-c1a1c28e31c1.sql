@@ -1,0 +1,1 @@
+ALTER TABLE public.food_trucks ADD COLUMN IF NOT EXISTS social_links jsonb NOT NULL DEFAULT '[]'::jsonb;

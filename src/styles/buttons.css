@@ -1,0 +1,74 @@
+/* ============================================================
+   Buttons
+   ============================================================ */
+
+.nb-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  font-family: inherit;
+  font-weight: 700;
+  font-size: 0.85rem;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  padding: 0.6rem 1.1rem;
+  background: var(--paper);
+  color: var(--ink);
+  border: var(--border-w) solid var(--ink);
+  box-shadow: var(--shadow-sm);
+  cursor: crosshair;
+  transition:
+    transform 0.06s ease,
+    box-shadow 0.06s ease;
+}
+.nb-btn:hover {
+  transform: translate(-1px, -1px);
+  box-shadow: 5px 5px 0 var(--ink);
+}
+.nb-btn:active {
+  transform: translate(2px, 2px);
+  box-shadow: 1px 1px 0 var(--ink);
+}
+.nb-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+  transform: none;
+  box-shadow: var(--shadow-sm);
+}
+.nb-btn--outline {
+  background: var(--paper-2);
+  color: var(--ink);
+}
+.nb-btn--ghost {
+  background: transparent;
+  border-color: transparent;
+  box-shadow: none;
+  color: var(--ink);
+}
+.nb-btn--ghost:hover {
+  background: var(--cyan);
+  border-color: var(--ink);
+  box-shadow: none;
+  transform: none;
+}
+.nb-btn--green {
+  background: var(--open);
+  color: #fff;
+  border-color: var(--ink);
+}
+.nb-btn--danger {
+  color: var(--danger);
+}
+.nb-btn--block {
+  width: 100%;
+}
+.nb-btn--sm {
+  padding: 0.4rem 0.7rem;
+  font-size: 0.75rem;
+}
+.nb-btn--icon {
+  padding: 0.4rem;
+  width: 38px;
+  height: 38px;
+}

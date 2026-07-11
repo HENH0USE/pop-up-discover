@@ -1,0 +1,53 @@
+/* ============================================================
+   Header / top navigation
+   ============================================================ */
+
+.nb-header {
+  position: sticky;
+  top: 0;
+  z-index: 50;
+  background: var(--paper);
+  border-bottom: var(--border-w) solid var(--line);
+}
+.nb-header__inner {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  height: 64px;
+}
+.nb-logo {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.6rem;
+  font-weight: 700;
+  font-size: 1.25rem;
+  font-family: var(--font-display);
+}
+.nb-logo__mark {
+  display: grid;
+  place-items: center;
+  width: 34px;
+  height: 34px;
+  background: var(--cyan);
+}
+.nb-nav {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+.nb-navlink {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  font-size: 0.85rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  padding: 0.3rem 0.2rem;
+}
+
+
+.nb-subbar {
+  background: var(--paper-2);
+  border-bottom: var(--border-w) solid var(--ink);
+  padding: 0.75rem 0;
+}
