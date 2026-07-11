@@ -1,7 +1,7 @@
-import { createFileRoute, Navigate } from "@tanstack/react-router";
+import { createFileRoute, Link } from "@tanstack/react-router";
 import { useAuth } from "@/hooks/use-auth";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import { useState } from "react";
+import { useState, useMemo } from "react";
 import {
   getMyTruck,
   createFoodTruck,
@@ -34,6 +34,7 @@ import {
   Copy,
   Check,
   AlertCircle,
+  Lock,
 } from "lucide-react";
 import type { Database } from "@/integrations/supabase/types";
 import { ImageUpload } from "@/components/ImageUpload";
@@ -68,9 +69,77 @@ function DashboardPage() {
   const { user, isLoading: authLoading } = useAuth();
 
   if (authLoading) return <Loader />;
-  if (!user) return <Navigate to="/auth" />;
 
-  return <DashboardContent />;
+  return (
+    <>
+      {!user && <GuestBanner />}
+      <div className={!user ? "dashboard-guest" : undefined} aria-disabled={!user || undefined}>
+        {user ? <DashboardContent /> : <GuestDashboardPreview />}
+      </div>
+    </>
+  );
+}
+
+function GuestBanner() {
+  return (
+    <div
+      style={{
+        background: "var(--accent)",
+        color: "#fff",
+        padding: "0.75rem 1rem",
+        textAlign: "center",
+        fontWeight: 600,
+        display: "flex",
+        alignItems: "center",
+        justifyContent: "center",
+        gap: "0.75rem",
+        flexWrap: "wrap",
+      }}
+    >
+      <Lock size={16} />
+      <span>You're previewing the dashboard. Sign in to create and manage your Pop-Up.</span>
+      <Link to="/auth">
+        <Button size="sm" variant="outline">Sign in</Button>
+      </Link>
+    </div>
+  );
+}
+
+function GuestDashboardPreview() {
+  const queryClient = useQueryClient();
+  const samplePopup = useMemo(
+    () =>
+      ({
+        id: "guest-preview",
+        name: "Sample Pop-Up",
+        description: "This is a preview of what your Pop-Up dashboard will look like.",
+        spot_photo_url: null,
+        menu_photo_url: null,
+        current_location_address: "123 Main St, Anywhere",
+        current_latitude: 0,
+        current_longitude: 0,
+        is_open_now: true,
+        social_links: [{ label: "Instagram", url: "https://instagram.com/yourpopup" }],
+        slug: "sample-popup",
+      }) as unknown as PopupRow,
+    []
+  );
+
+  useMemo(() => {
+    queryClient.setQueryData(["pop-up", samplePopup.id], {
+      truck: samplePopup,
+      menuItems: [
+        { id: "m1", truck_id: samplePopup.id, name: "Signature Dish", description: "Our most popular item.", price: 12.5 },
+        { id: "m2", truck_id: samplePopup.id, name: "Side", description: "A tasty side.", price: 4.0 },
+      ],
+      schedules: [
+        { id: "s1", truck_id: samplePopup.id, day_of_week: 1, start_time: "11:00", end_time: "20:00", location_name: "Downtown Plaza", location_address: "1 Plaza Way" },
+      ],
+    });
+    return null;
+  }, [queryClient, samplePopup]);
+
+  return <ManagePopup popup={samplePopup} />;
 }
 
 function DashboardContent() {

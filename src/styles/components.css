@@ -155,3 +155,24 @@
   background: #fff;
   border-color: #fff;
 }
+
+/* Guest (unauthenticated) dashboard preview — read-only */
+.dashboard-guest button:not([role="tab"]),
+.dashboard-guest input,
+.dashboard-guest textarea,
+.dashboard-guest select,
+.dashboard-guest [role="switch"],
+.dashboard-guest [role="combobox"] {
+  pointer-events: none !important;
+  opacity: 0.65;
+  cursor: not-allowed;
+}
+.dashboard-guest form {
+  pointer-events: none;
+}
+.dashboard-guest [role="tablist"],
+.dashboard-guest [role="tablist"] * {
+  pointer-events: auto !important;
+  opacity: 1 !important;
+  cursor: pointer;
+}
