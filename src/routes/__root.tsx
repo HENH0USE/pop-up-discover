@@ -70,10 +70,10 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
     meta: [
       { charSet: "utf-8" },
       { name: "viewport", content: "width=device-width, initial-scale=1" },
-      { title: "TruckSpot - Find Local Food Trucks" },
-      { name: "description", content: "Find local popups and more, support your community." },
+      { title: "PopSpot — Find Local Pop-Ups" },
+      { name: "description", content: "Find local pop-ups and support your community." },
       { name: "author", content: "Lovable" },
-      { property: "og:title", content: "TruckSpot" },
+      { property: "og:title", content: "PopSpot" },
       { property: "og:description", content: "Find local pop-ups" },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary" },

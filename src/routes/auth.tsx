@@ -6,7 +6,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Truck, AlertCircle } from "lucide-react";
+import { Store, AlertCircle } from "lucide-react";
 import { createLovableAuth } from "@lovable.dev/cloud-auth-js";
 
 export const Route = createFileRoute("/auth")({
@@ -93,7 +93,7 @@ function AuthPage() {
     <div className="page flex col items-center justify-center" style={{ padding: "3rem 1rem" }}>
       <Link to="/" className="nb-logo mb-4" style={{ fontSize: "1.5rem" }}>
         <span className="nb-logo__mark">
-          <Truck size={20} />
+          <Store size={20} />
         </span>
         <span>PoPoP FINDR</span>
       </Link>

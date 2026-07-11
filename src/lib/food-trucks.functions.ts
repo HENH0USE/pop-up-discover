@@ -233,7 +233,7 @@ export const createFoodTruck = createServerFn({ method: "POST" })
       .object({
         name: z.string().min(1).max(100),
         description: z.string().max(500).optional(),
-        cuisine_type: z.string(),
+        cuisine_type: z.string().optional(),
         photo_url: z.string().url().optional().or(z.literal("")),
         spot_photo_url: z.string().optional(),
         menu_photo_url: z.string().optional(),
@@ -265,7 +265,9 @@ export const createFoodTruck = createServerFn({ method: "POST" })
         name: data.name,
         slug,
         description: data.description || null,
-        cuisine_type: data.cuisine_type as Database["public"]["Enums"]["cuisine_type"],
+        ...(data.cuisine_type
+          ? { cuisine_type: data.cuisine_type as Database["public"]["Enums"]["cuisine_type"] }
+          : {}),
         photo_url: data.photo_url || null,
         spot_photo_url: data.spot_photo_url || null,
         menu_photo_url: data.menu_photo_url || null,
