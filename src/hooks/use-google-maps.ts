@@ -1,9 +1,15 @@
 import { useEffect, useState } from "react";
 
+// Loose typing for the Google Maps global; the real types come from @types/google.maps
+// at runtime once the script has loaded. We keep this file typecheck-clean without
+// depending on the ambient `google` namespace being resolved.
+type GoogleGlobal = { maps: unknown } & Record<string, unknown>;
+
 declare global {
   interface Window {
-    __googleMapsPromise?: Promise<typeof google>;
+    __googleMapsPromise?: Promise<GoogleGlobal>;
     initGoogleMaps?: () => void;
+    google?: GoogleGlobal;
   }
 }
 
@@ -14,7 +20,7 @@ const TRACKING_ID = import.meta.env.VITE_LOVABLE_CONNECTOR_GOOGLE_MAPS_TRACKING_
   | string
   | undefined;
 
-function loadGoogleMaps(): Promise<typeof google> {
+function loadGoogleMaps(): Promise<GoogleGlobal> {
   if (typeof window === "undefined") {
     return Promise.reject(new Error("Google Maps can only load in the browser"));
   }
@@ -30,7 +36,7 @@ function loadGoogleMaps(): Promise<typeof google> {
       reject(new Error("Missing Google Maps browser key"));
       return;
     }
-    window.initGoogleMaps = () => resolve(window.google);
+    window.initGoogleMaps = () => resolve(window.google as GoogleGlobal);
     const script = document.createElement("script");
     const params = new URLSearchParams({
       key: BROWSER_KEY,
@@ -48,8 +54,8 @@ function loadGoogleMaps(): Promise<typeof google> {
 }
 
 export function useGoogleMaps() {
-  const [maps, setMaps] = useState<typeof google | null>(
-    typeof window !== "undefined" && window.google?.maps ? window.google : null
+  const [maps, setMaps] = useState<GoogleGlobal | null>(
+    typeof window !== "undefined" && window.google?.maps ? (window.google as GoogleGlobal) : null
   );
   const [error, setError] = useState<string | null>(null);
 
