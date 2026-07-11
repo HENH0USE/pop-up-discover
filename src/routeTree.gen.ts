@@ -13,8 +13,8 @@ import { Route as MapRouteImport } from './routes/map'
 import { Route as DashboardRouteImport } from './routes/dashboard'
 import { Route as AuthRouteImport } from './routes/auth'
 import { Route as IndexRouteImport } from './routes/index'
-import { Route as TruckTruckIdRouteImport } from './routes/truck.$truckId'
-import { Route as TSlugRouteImport } from './routes/t.$slug'
+import { Route as PopupPopupIdRouteImport } from './routes/popup.$popupId'
+import { Route as PSlugRouteImport } from './routes/p.$slug'
 
 const MapRoute = MapRouteImport.update({
   id: '/map',
@@ -36,14 +36,14 @@ const IndexRoute = IndexRouteImport.update({
   path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
-const TruckTruckIdRoute = TruckTruckIdRouteImport.update({
-  id: '/truck/$truckId',
-  path: '/truck/$truckId',
+const PopupPopupIdRoute = PopupPopupIdRouteImport.update({
+  id: '/popup/$popupId',
+  path: '/popup/$popupId',
   getParentRoute: () => rootRouteImport,
 } as any)
-const TSlugRoute = TSlugRouteImport.update({
-  id: '/t/$slug',
-  path: '/t/$slug',
+const PSlugRoute = PSlugRouteImport.update({
+  id: '/p/$slug',
+  path: '/p/$slug',
   getParentRoute: () => rootRouteImport,
 } as any)
 
@@ -52,16 +52,16 @@ export interface FileRoutesByFullPath {
   '/auth': typeof AuthRoute
   '/dashboard': typeof DashboardRoute
   '/map': typeof MapRoute
-  '/t/$slug': typeof TSlugRoute
-  '/truck/$truckId': typeof TruckTruckIdRoute
+  '/p/$slug': typeof PSlugRoute
+  '/popup/$popupId': typeof PopupPopupIdRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/auth': typeof AuthRoute
   '/dashboard': typeof DashboardRoute
   '/map': typeof MapRoute
-  '/t/$slug': typeof TSlugRoute
-  '/truck/$truckId': typeof TruckTruckIdRoute
+  '/p/$slug': typeof PSlugRoute
+  '/popup/$popupId': typeof PopupPopupIdRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -69,8 +69,8 @@ export interface FileRoutesById {
   '/auth': typeof AuthRoute
   '/dashboard': typeof DashboardRoute
   '/map': typeof MapRoute
-  '/t/$slug': typeof TSlugRoute
-  '/truck/$truckId': typeof TruckTruckIdRoute
+  '/p/$slug': typeof PSlugRoute
+  '/popup/$popupId': typeof PopupPopupIdRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -79,18 +79,18 @@ export interface FileRouteTypes {
     | '/auth'
     | '/dashboard'
     | '/map'
-    | '/t/$slug'
-    | '/truck/$truckId'
+    | '/p/$slug'
+    | '/popup/$popupId'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/auth' | '/dashboard' | '/map' | '/t/$slug' | '/truck/$truckId'
+  to: '/' | '/auth' | '/dashboard' | '/map' | '/p/$slug' | '/popup/$popupId'
   id:
     | '__root__'
     | '/'
     | '/auth'
     | '/dashboard'
     | '/map'
-    | '/t/$slug'
-    | '/truck/$truckId'
+    | '/p/$slug'
+    | '/popup/$popupId'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -98,8 +98,8 @@ export interface RootRouteChildren {
   AuthRoute: typeof AuthRoute
   DashboardRoute: typeof DashboardRoute
   MapRoute: typeof MapRoute
-  TSlugRoute: typeof TSlugRoute
-  TruckTruckIdRoute: typeof TruckTruckIdRoute
+  PSlugRoute: typeof PSlugRoute
+  PopupPopupIdRoute: typeof PopupPopupIdRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -132,18 +132,18 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/truck/$truckId': {
-      id: '/truck/$truckId'
-      path: '/truck/$truckId'
-      fullPath: '/truck/$truckId'
-      preLoaderRoute: typeof TruckTruckIdRouteImport
+    '/popup/$popupId': {
+      id: '/popup/$popupId'
+      path: '/popup/$popupId'
+      fullPath: '/popup/$popupId'
+      preLoaderRoute: typeof PopupPopupIdRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/t/$slug': {
-      id: '/t/$slug'
-      path: '/t/$slug'
-      fullPath: '/t/$slug'
-      preLoaderRoute: typeof TSlugRouteImport
+    '/p/$slug': {
+      id: '/p/$slug'
+      path: '/p/$slug'
+      fullPath: '/p/$slug'
+      preLoaderRoute: typeof PSlugRouteImport
       parentRoute: typeof rootRouteImport
     }
   }
@@ -154,8 +154,8 @@ const rootRouteChildren: RootRouteChildren = {
   AuthRoute: AuthRoute,
   DashboardRoute: DashboardRoute,
   MapRoute: MapRoute,
-  TSlugRoute: TSlugRoute,
-  TruckTruckIdRoute: TruckTruckIdRoute,
+  PSlugRoute: PSlugRoute,
+  PopupPopupIdRoute: PopupPopupIdRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)

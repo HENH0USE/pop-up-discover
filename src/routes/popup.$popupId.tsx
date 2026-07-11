@@ -12,7 +12,7 @@ type MenuItem = Database["public"]["Tables"]["menu_items"]["Row"];
 type Schedule = Database["public"]["Tables"]["schedules"]["Row"];
 type TruckDetail = { truck: FoodTruck; menuItems: MenuItem[]; schedules: Schedule[] };
 
-export const Route = createFileRoute("/truck/$truckId")({
+export const Route = createFileRoute("/popup/$popupId")({
   component: TruckDetailPage,
   loader: async ({ params }) => {
     const truck = await getFoodTruck({ data: { id: params.truckId } });

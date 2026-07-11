@@ -1,7 +1,7 @@
 import { createFileRoute, redirect } from "@tanstack/react-router";
 import { getTruckIdBySlug } from "@/lib/food-trucks.functions";
 
-export const Route = createFileRoute("/t/$slug")({
+export const Route = createFileRoute("/p/$slug")({
   loader: async ({ params }) => {
     const result = await getTruckIdBySlug({ data: { slug: params.slug } });
     if (!result) {
