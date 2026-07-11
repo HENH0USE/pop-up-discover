@@ -7,7 +7,7 @@ export const Route = createFileRoute("/p/$slug")({
     if (!result) {
       throw redirect({ to: "/map" });
     }
-    throw redirect({ to: "/map", search: { truck: result.id } });
+    throw redirect({ to: "/map", search: { popup: result.id } });
   },
   component: () => null,
 });
