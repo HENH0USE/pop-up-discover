@@ -125,7 +125,7 @@ function GuestDashboardPreview() {
     []
   );
 
-  useMemo(() => {
+  useEffect(() => {
     queryClient.setQueryData(["pop-up", samplePopup.id], {
       truck: samplePopup,
       menuItems: [
@@ -136,7 +136,6 @@ function GuestDashboardPreview() {
         { id: "s1", truck_id: samplePopup.id, day_of_week: 1, start_time: "11:00", end_time: "20:00", location_name: "Downtown Plaza", location_address: "1 Plaza Way" },
       ],
     });
-    return null;
   }, [queryClient, samplePopup]);
 
   return <ManagePopup popup={samplePopup} />;
@@ -329,8 +328,8 @@ function SharePopup({ popup }: { popup: PopupRow }) {
 
 function ManagePopup({ popup }: { popup: PopupRow }) {
   const [activeTab, setActiveTab] = useState("profile");
-  const profileSaveRef = useRef<{ save: () => void; isPending: boolean } | null>(null);
-  const [, forceRerender] = useState(0);
+  const profileSaveRef = useRef<{ save: () => void } | null>(null);
+  const [isProfileSaving, setIsProfileSaving] = useState(false);
 
   return (
     <div className="page container" style={{ paddingTop: "2rem", paddingBottom: "3rem" }}>
@@ -354,9 +353,9 @@ function ManagePopup({ popup }: { popup: PopupRow }) {
           {activeTab === "profile" && (
             <Button
               onClick={() => profileSaveRef.current?.save()}
-              disabled={profileSaveRef.current?.isPending}
+              disabled={isProfileSaving}
             >
-              {profileSaveRef.current?.isPending ? (
+              {isProfileSaving ? (
                 <Loader2 size={16} className="spin" />
               ) : (
                 <Save size={16} />
@@ -370,7 +369,7 @@ function ManagePopup({ popup }: { popup: PopupRow }) {
           <PopupProfileForm
             popup={popup}
             saveRef={profileSaveRef}
-            onStateChange={() => forceRerender((n) => n + 1)}
+            onPendingChange={setIsProfileSaving}
           />
         </TabsContent>
 
@@ -433,11 +432,11 @@ function SocialLinksEditor({
 function PopupProfileForm({
   popup,
   saveRef,
-  onStateChange,
+  onPendingChange,
 }: {
   popup: PopupRow;
-  saveRef?: React.MutableRefObject<{ save: () => void; isPending: boolean } | null>;
-  onStateChange?: () => void;
+  saveRef?: React.MutableRefObject<{ save: () => void } | null>;
+  onPendingChange?: (isPending: boolean) => void;
 }) {
   const queryClient = useQueryClient();
   const { user } = useAuth();
@@ -497,11 +496,11 @@ function PopupProfileForm({
   };
 
   if (saveRef) {
-    saveRef.current = { save: handleSave, isPending: updateMutation.isPending };
+    saveRef.current = { save: handleSave };
   }
   useEffect(() => {
-    onStateChange?.();
-  }, [updateMutation.isPending, onStateChange]);
+    onPendingChange?.(updateMutation.isPending);
+  }, [updateMutation.isPending, onPendingChange]);
 
   return (
     <Card>
