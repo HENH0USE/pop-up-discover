@@ -21,6 +21,7 @@ function createPublicClient() {
 type PhotoFields = {
   spot_photo_url: string | null;
   menu_photo_url: string | null;
+  logo_url?: string | null;
 };
 
 // Replace stored storage paths with temporary signed URLs for display.
@@ -31,6 +32,7 @@ async function withSignedPhotos<T extends PhotoFields>(trucks: T[]): Promise<T[]
   for (const t of trucks) {
     if (t.spot_photo_url && !/^https?:\/\//i.test(t.spot_photo_url)) paths.add(t.spot_photo_url);
     if (t.menu_photo_url && !/^https?:\/\//i.test(t.menu_photo_url)) paths.add(t.menu_photo_url);
+    if (t.logo_url && !/^https?:\/\//i.test(t.logo_url)) paths.add(t.logo_url);
   }
   if (paths.size === 0) return trucks;
 
@@ -54,6 +56,7 @@ async function withSignedPhotos<T extends PhotoFields>(trucks: T[]): Promise<T[]
     ...t,
     spot_photo_url: resolve(t.spot_photo_url),
     menu_photo_url: resolve(t.menu_photo_url),
+    logo_url: resolve(t.logo_url ?? null),
   }));
 }
 
@@ -302,6 +305,10 @@ export const updateFoodTruck = createServerFn({ method: "POST" })
         photo_url: z.string().url().optional().or(z.literal("")),
         spot_photo_url: z.string().nullable().optional(),
         menu_photo_url: z.string().nullable().optional(),
+        logo_url: z.string().nullable().optional(),
+        card_bg_color: z.string().nullable().optional(),
+        card_text_color: z.string().nullable().optional(),
+        card_accent_color: z.string().nullable().optional(),
         social_links: z
           .array(z.object({ label: z.string().min(1).max(50), url: z.string().url() }))
           .optional(),
@@ -341,6 +348,10 @@ export const updateFoodTruck = createServerFn({ method: "POST" })
     if (data.photo_url !== undefined) updateData.photo_url = data.photo_url || null;
     if (data.spot_photo_url !== undefined) updateData.spot_photo_url = data.spot_photo_url || null;
     if (data.menu_photo_url !== undefined) updateData.menu_photo_url = data.menu_photo_url || null;
+    if (data.logo_url !== undefined) (updateData as Record<string, unknown>).logo_url = data.logo_url || null;
+    if (data.card_bg_color !== undefined) (updateData as Record<string, unknown>).card_bg_color = data.card_bg_color || null;
+    if (data.card_text_color !== undefined) (updateData as Record<string, unknown>).card_text_color = data.card_text_color || null;
+    if (data.card_accent_color !== undefined) (updateData as Record<string, unknown>).card_accent_color = data.card_accent_color || null;
     if (data.social_links !== undefined) (updateData as Record<string, unknown>).social_links = data.social_links;
     if (data.current_location_address !== undefined) {
       const addr = data.current_location_address.trim();
