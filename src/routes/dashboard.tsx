@@ -552,7 +552,6 @@ function PopupProfileForm({
             <ColorField label="Accent" value={cardAccent} onChange={setCardAccent} />
           </div>
         </div>
-        )}
         <div>
           <Label>Current Location Address</Label>
           <Input value={address} onChange={(e) => setAddress(e.target.value)} />
