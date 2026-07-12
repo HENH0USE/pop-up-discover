@@ -143,13 +143,33 @@ function GuestDashboardPreview() {
 }
 
 function DashboardContent() {
+  const queryClient = useQueryClient();
   const { data: popup, isLoading } = useQuery({
     queryKey: ["my-popup"],
     queryFn: () => getMyTruck(),
   });
 
+  const createMutation = useMutation({
+    mutationFn: async () =>
+      createFoodTruck({
+        data: {
+          name: "My Pop-Up",
+          description: "",
+          spot_photo_url: "",
+          menu_photo_url: "",
+          current_location_address: "",
+        },
+      }),
+    onSuccess: () => queryClient.invalidateQueries({ queryKey: ["my-popup"] }),
+  });
+
   if (isLoading) return <Loader />;
-  if (!popup) return <CreatePopupForm />;
+  if (!popup) {
+    if (!createMutation.isPending && !createMutation.isSuccess) {
+      createMutation.mutate();
+    }
+    return <Loader />;
+  }
   return <ManagePopup popup={popup} />;
 }
 
