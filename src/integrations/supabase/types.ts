@@ -16,6 +16,9 @@ export type Database = {
     Tables: {
       food_trucks: {
         Row: {
+          card_accent_color: string | null
+          card_bg_color: string | null
+          card_text_color: string | null
           created_at: string
           cuisine_type: Database["public"]["Enums"]["cuisine_type"]
           current_latitude: number | null
@@ -25,6 +28,7 @@ export type Database = {
           id: string
           is_active: boolean
           is_open_now: boolean
+          logo_url: string | null
           menu_photo_url: string | null
           name: string
           owner_id: string
@@ -35,6 +39,9 @@ export type Database = {
           updated_at: string
         }
         Insert: {
+          card_accent_color?: string | null
+          card_bg_color?: string | null
+          card_text_color?: string | null
           created_at?: string
           cuisine_type?: Database["public"]["Enums"]["cuisine_type"]
           current_latitude?: number | null
@@ -44,6 +51,7 @@ export type Database = {
           id?: string
           is_active?: boolean
           is_open_now?: boolean
+          logo_url?: string | null
           menu_photo_url?: string | null
           name: string
           owner_id: string
@@ -54,6 +62,9 @@ export type Database = {
           updated_at?: string
         }
         Update: {
+          card_accent_color?: string | null
+          card_bg_color?: string | null
+          card_text_color?: string | null
           created_at?: string
           cuisine_type?: Database["public"]["Enums"]["cuisine_type"]
           current_latitude?: number | null
@@ -63,6 +74,7 @@ export type Database = {
           id?: string
           is_active?: boolean
           is_open_now?: boolean
+          logo_url?: string | null
           menu_photo_url?: string | null
           name?: string
           owner_id?: string
