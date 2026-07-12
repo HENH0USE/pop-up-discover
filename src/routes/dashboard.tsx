@@ -496,12 +496,12 @@ function PopupProfileForm({
     });
   };
 
+  if (saveRef) {
+    saveRef.current = { save: handleSave, isPending: updateMutation.isPending };
+  }
   useEffect(() => {
-    if (saveRef) {
-      saveRef.current = { save: handleSave, isPending: updateMutation.isPending };
-      onStateChange?.();
-    }
-  });
+    onStateChange?.();
+  }, [updateMutation.isPending, onStateChange]);
 
   return (
     <Card>
