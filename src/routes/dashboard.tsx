@@ -328,6 +328,10 @@ function SharePopup({ popup }: { popup: PopupRow }) {
 }
 
 function ManagePopup({ popup }: { popup: PopupRow }) {
+  const [activeTab, setActiveTab] = useState("profile");
+  const profileSaveRef = useRef<{ save: () => void; isPending: boolean } | null>(null);
+  const [, forceRerender] = useState(0);
+
   return (
     <div className="page container" style={{ paddingTop: "2rem", paddingBottom: "3rem" }}>
       <div className="mb-4">
@@ -337,15 +341,37 @@ function ManagePopup({ popup }: { popup: PopupRow }) {
 
       <SharePopup popup={popup} />
 
-      <Tabs defaultValue="profile">
-        <TabsList className="mb-4">
-          <TabsTrigger value="profile">Profile</TabsTrigger>
-          <TabsTrigger value="menu">Menu</TabsTrigger>
-          <TabsTrigger value="schedule">Schedule</TabsTrigger>
-        </TabsList>
+      <Tabs value={activeTab} onValueChange={setActiveTab}>
+        <div
+          className="mb-4 flex items-center justify-between gap-1"
+          style={{ flexWrap: "wrap" }}
+        >
+          <TabsList>
+            <TabsTrigger value="profile">Profile</TabsTrigger>
+            <TabsTrigger value="menu">Menu</TabsTrigger>
+            <TabsTrigger value="schedule">Schedule</TabsTrigger>
+          </TabsList>
+          {activeTab === "profile" && (
+            <Button
+              onClick={() => profileSaveRef.current?.save()}
+              disabled={profileSaveRef.current?.isPending}
+            >
+              {profileSaveRef.current?.isPending ? (
+                <Loader2 size={16} className="spin" />
+              ) : (
+                <Save size={16} />
+              )}
+              Save Changes
+            </Button>
+          )}
+        </div>
 
         <TabsContent value="profile">
-          <PopupProfileForm popup={popup} />
+          <PopupProfileForm
+            popup={popup}
+            saveRef={profileSaveRef}
+            onStateChange={() => forceRerender((n) => n + 1)}
+          />
         </TabsContent>
 
         <TabsContent value="menu">
