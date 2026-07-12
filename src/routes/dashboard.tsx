@@ -1,7 +1,7 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useAuth } from "@/hooks/use-auth";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import { useState, useMemo } from "react";
+import { useState, useMemo, useRef, useEffect } from "react";
 import {
   getMyTruck,
   createFoodTruck,
@@ -430,13 +430,31 @@ function SocialLinksEditor({
   );
 }
 
-function PopupProfileForm({ popup }: { popup: PopupRow }) {
+function PopupProfileForm({
+  popup,
+  saveRef,
+  onStateChange,
+}: {
+  popup: PopupRow;
+  saveRef?: React.MutableRefObject<{ save: () => void; isPending: boolean } | null>;
+  onStateChange?: () => void;
+}) {
   const queryClient = useQueryClient();
   const { user } = useAuth();
   const [name, setName] = useState(popup.name);
   const [description, setDescription] = useState(popup.description || "");
   const [spotPhoto, setSpotPhoto] = useState<string | null>(popup.spot_photo_url);
   const [menuPhoto, setMenuPhoto] = useState<string | null>(popup.menu_photo_url);
+  const p = popup as unknown as {
+    logo_url?: string | null;
+    card_bg_color?: string | null;
+    card_text_color?: string | null;
+    card_accent_color?: string | null;
+  };
+  const [logo, setLogo] = useState<string | null>(p.logo_url ?? null);
+  const [cardBg, setCardBg] = useState<string>(p.card_bg_color ?? "#f4f1e9");
+  const [cardText, setCardText] = useState<string>(p.card_text_color ?? "#111111");
+  const [cardAccent, setCardAccent] = useState<string>(p.card_accent_color ?? "#d97706");
   const [address, setAddress] = useState(popup.current_location_address || "");
   const [isOpen, setIsOpen] = useState(popup.is_open_now);
   const [socialLinks, setSocialLinks] = useState<SocialLink[]>(
@@ -450,6 +468,10 @@ function PopupProfileForm({ popup }: { popup: PopupRow }) {
       description: string;
       spot_photo_url: string | null;
       menu_photo_url: string | null;
+      logo_url: string | null;
+      card_bg_color: string | null;
+      card_text_color: string | null;
+      card_accent_color: string | null;
       social_links: SocialLink[];
       current_location_address: string;
       is_open_now: boolean;
@@ -464,11 +486,22 @@ function PopupProfileForm({ popup }: { popup: PopupRow }) {
       description,
       spot_photo_url: spotPhoto,
       menu_photo_url: menuPhoto,
+      logo_url: logo,
+      card_bg_color: cardBg,
+      card_text_color: cardText,
+      card_accent_color: cardAccent,
       social_links: socialLinks.filter((s) => s.label.trim() && s.url.trim()),
       current_location_address: address,
       is_open_now: isOpen,
     });
   };
+
+  useEffect(() => {
+    if (saveRef) {
+      saveRef.current = { save: handleSave, isPending: updateMutation.isPending };
+      onStateChange?.();
+    }
+  });
 
   return (
     <Card>
@@ -485,22 +518,40 @@ function PopupProfileForm({ popup }: { popup: PopupRow }) {
           <Textarea value={description} onChange={(e) => setDescription(e.target.value)} rows={3} />
         </div>
         {user && (
-          <div className="grid-two">
+          <>
+            <div className="grid-two">
+              <ImageUpload
+                userId={user.id}
+                value={spotPhoto}
+                onChange={setSpotPhoto}
+                label="Photo 1"
+                hint="Shown on your pop-up card."
+              />
+              <ImageUpload
+                userId={user.id}
+                value={menuPhoto}
+                onChange={setMenuPhoto}
+                label="Photo 2"
+                hint="A second photo of your pop-up."
+              />
+            </div>
             <ImageUpload
               userId={user.id}
-              value={spotPhoto}
-              onChange={setSpotPhoto}
-              label="Photo of the Spot"
-              hint="Where your pop-up is set up."
+              value={logo}
+              onChange={setLogo}
+              label="Logo"
+              hint="Your pop-up logo (shown on the card)."
             />
-            <ImageUpload
-              userId={user.id}
-              value={menuPhoto}
-              onChange={setMenuPhoto}
-              label="Photo of the Menu"
-              hint="Your menu board."
-            />
+          </>
+        )}
+        <div>
+          <Label>Card Colors</Label>
+          <div className="flex items-center gap-1" style={{ flexWrap: "wrap", marginTop: "0.5rem" }}>
+            <ColorField label="Background" value={cardBg} onChange={setCardBg} />
+            <ColorField label="Text" value={cardText} onChange={setCardText} />
+            <ColorField label="Accent" value={cardAccent} onChange={setCardAccent} />
           </div>
+        </div>
         )}
         <div>
           <Label>Current Location Address</Label>
@@ -517,12 +568,37 @@ function PopupProfileForm({ popup }: { popup: PopupRow }) {
           <Switch checked={isOpen} onCheckedChange={setIsOpen} id="open-toggle" />
           <Label htmlFor="open-toggle">Currently Open</Label>
         </div>
-        <Button onClick={handleSave} disabled={updateMutation.isPending}>
-          {updateMutation.isPending ? <Loader2 size={16} className="spin" /> : <Save size={16} />}
-          Save Changes
-        </Button>
       </CardContent>
     </Card>
+  );
+}
+
+function ColorField({
+  label,
+  value,
+  onChange,
+}: {
+  label: string;
+  value: string;
+  onChange: (v: string) => void;
+}) {
+  return (
+    <label className="flex items-center gap-1" style={{ fontSize: "0.8rem", fontWeight: 700 }}>
+      <input
+        type="color"
+        value={value}
+        onChange={(e) => onChange(e.target.value)}
+        style={{
+          width: 36,
+          height: 36,
+          padding: 0,
+          border: "var(--border-w) solid var(--ink)",
+          background: value,
+          cursor: "pointer",
+        }}
+      />
+      {label}
+    </label>
   );
 }
 
