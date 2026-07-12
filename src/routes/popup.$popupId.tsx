@@ -137,13 +137,13 @@ function PopupDetailPage() {
             <CardHeader>
               <CardTitle>
                 <DollarSign size={20} style={{ color: "var(--accent)" }} />
-                Menu Photo
+                More Photos
               </CardTitle>
             </CardHeader>
             <CardContent>
               <img
                 src={truck.menu_photo_url}
-                alt={`${truck.name} menu`}
+                alt={`${truck.name}`}
                 style={{ width: "100%", border: "var(--border-w) solid var(--ink)" }}
               />
             </CardContent>
