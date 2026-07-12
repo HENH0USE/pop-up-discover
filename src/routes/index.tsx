@@ -287,17 +287,48 @@ function PopupCard({
     description: string | null;
     current_location_address: string | null;
     is_open_now: boolean;
+    logo_url?: string | null;
+    card_bg_color?: string | null;
+    card_text_color?: string | null;
+    card_accent_color?: string | null;
   };
   dist: number;
 }) {
+  const bg = popup.card_bg_color || undefined;
+  const text = popup.card_text_color || undefined;
+  const accent = popup.card_accent_color || undefined;
   return (
     <Link to="/popup/$popupId" params={{ popupId: popup.id }}>
-      <Card className="nb-card--link" style={{ overflow: "hidden" }}>
+      <Card
+        className="nb-card--link"
+        style={{
+          overflow: "hidden",
+          background: bg,
+          color: text,
+          ...(accent ? ({ ["--accent" as string]: accent } as React.CSSProperties) : {}),
+        }}
+      >
         <div className="media-box relative">
           {popup.spot_photo_url ? (
             <img src={popup.spot_photo_url} alt={popup.name} loading="lazy" />
           ) : (
             <MapPin size={32} />
+          )}
+          {popup.logo_url && (
+            <img
+              src={popup.logo_url}
+              alt={`${popup.name} logo`}
+              style={{
+                position: "absolute",
+                bottom: 8,
+                left: 8,
+                width: 44,
+                height: 44,
+                objectFit: "cover",
+                border: "var(--border-w) solid var(--ink)",
+                background: "#fff",
+              }}
+            />
           )}
           <Badge
             variant={popup.is_open_now ? "open" : "closed"}
@@ -314,13 +345,13 @@ function PopupCard({
             </Badge>
           </div>
           {popup.current_location_address && (
-            <p className="muted flex items-center gap-1 mt-1" style={{ fontSize: "0.85rem" }}>
+            <p className="flex items-center gap-1 mt-1" style={{ fontSize: "0.85rem", opacity: 0.8 }}>
               <MapPin size={14} />
               {popup.current_location_address}
             </p>
           )}
           {popup.description && (
-            <p className="muted clamp-2 mt-1" style={{ fontSize: "0.85rem" }}>
+            <p className="clamp-2 mt-1" style={{ fontSize: "0.85rem", opacity: 0.8 }}>
               {popup.description}
             </p>
           )}
