@@ -180,11 +180,32 @@ function HomePage() {
         <Card className="nb-card">
           <CardContent className="text-center" style={{ padding: "2.5rem 1.5rem" }}>
             <h2 style={{ fontSize: "1.4rem", textTransform: "uppercase", letterSpacing: "0.02em", marginBottom: "0.75rem" }}>
-              Your Pop-Up Card
+              Find local vendors support your community
             </h2>
-            <p className="muted" style={{ maxWidth: 640, margin: "0 auto", lineHeight: 1.5 }}>
-              Create a shareable card link with your info, menu and live location on google maps so customers can find you instantly.
+            <p className="muted" style={{ maxWidth: 640, margin: "0 auto 1.25rem", lineHeight: 1.5 }}>
+              Pop in your area code to see every Pop-Up around you.
             </p>
+            <form className="nb-search-row" onSubmit={handleSearch} style={{ margin: "0 auto" }}>
+              <div className="relative flex-1">
+                <Search size={16} className="nb-field-icon" />
+                <Input
+                  placeholder="Enter ZIP / area code..."
+                  value={zipInput}
+                  inputMode="numeric"
+                  onChange={(e) => setZipInput(e.target.value)}
+                  className="nb-input--with-icon"
+                />
+              </div>
+              <Button type="submit" disabled={searching}>
+                {searching ? <Loader2 size={16} className="spin" /> : <Navigation size={16} />}
+                Search
+              </Button>
+            </form>
+            {geoError && (
+              <p className="mt-1" style={{ fontSize: "0.85rem", color: "var(--closed)" }}>
+                {geoError}
+              </p>
+            )}
           </CardContent>
         </Card>
 
@@ -220,35 +241,6 @@ function HomePage() {
         </Card>
       </div>
 
-      <section className="nb-hero" style={{ padding: "3rem 1rem" }}>
-        <div className="text-center">
-          <h1>Find local vendors support your community</h1>
-          <p className="nb-hero__lead">Pop in your area code</p>
-
-          <form className="nb-search-row" onSubmit={handleSearch}>
-            <div className="relative flex-1">
-              <Search size={16} className="nb-field-icon" />
-              <Input
-                placeholder="Enter ZIP / area code..."
-                value={zipInput}
-                inputMode="numeric"
-                onChange={(e) => setZipInput(e.target.value)}
-                className="nb-input--with-icon"
-              />
-            </div>
-            <Button type="submit" disabled={searching}>
-              {searching ? <Loader2 size={16} className="spin" /> : <Navigation size={16} />}
-              Search
-            </Button>
-          </form>
-          {geoError && (
-            <p className="mt-1" style={{ fontSize: "0.85rem", color: "var(--closed)" }}>
-              {geoError}
-            </p>
-          )}
-        </div>
-      </section>
-
       <div className="container" style={{ paddingTop: "2rem", paddingBottom: "3rem" }}>
         {center && (
           <section>
@@ -272,6 +264,34 @@ function HomePage() {
           </section>
         )}
       </div>
+
+      <section className="nb-hero" style={{ padding: "3rem 1rem" }}>
+        <div className="container text-center">
+          <h1>Your Pop-Up Card</h1>
+          <p className="nb-hero__lead">
+            Create a shareable card link with your info, menu and live location on google maps so customers can find you instantly.
+          </p>
+          <Link to="/auth" className="nb-btn">
+            Get Your Card
+          </Link>
+        </div>
+      </section>
+
+      <footer
+        style={{
+          background: "var(--ink)",
+          color: "#fff",
+          padding: "2rem 1rem",
+          textAlign: "center",
+        }}
+      >
+        <div className="container">
+          <p style={{ fontWeight: 700, marginBottom: "0.5rem" }}>Pop-Up Live</p>
+          <p style={{ fontSize: "0.85rem", opacity: 0.8 }}>
+            &copy; {new Date().getFullYear()} Pop-Up Live. Bringing local vendors to your community.
+          </p>
+        </div>
+      </footer>
     </div>
   );
 }
