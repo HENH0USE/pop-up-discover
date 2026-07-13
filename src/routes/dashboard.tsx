@@ -450,10 +450,7 @@ function PopupProfileForm({
     card_text_color?: string | null;
     card_accent_color?: string | null;
   };
-  const [logo, setLogo] = useState<string | null>(p.logo_url ?? null);
-  const [cardBg, setCardBg] = useState<string>(p.card_bg_color ?? "#f4f1e9");
-  const [cardText, setCardText] = useState<string>(p.card_text_color ?? "#111111");
-  const [cardAccent, setCardAccent] = useState<string>(p.card_accent_color ?? "#d97706");
+  void p;
   const [address, setAddress] = useState(popup.current_location_address || "");
   const [isOpen, setIsOpen] = useState(popup.is_open_now);
   const [socialLinks, setSocialLinks] = useState<SocialLink[]>(
@@ -467,10 +464,6 @@ function PopupProfileForm({
       description: string;
       spot_photo_url: string | null;
       menu_photo_url: string | null;
-      logo_url: string | null;
-      card_bg_color: string | null;
-      card_text_color: string | null;
-      card_accent_color: string | null;
       social_links: SocialLink[];
       current_location_address: string;
       is_open_now: boolean;
@@ -485,10 +478,6 @@ function PopupProfileForm({
       description,
       spot_photo_url: spotPhoto,
       menu_photo_url: menuPhoto,
-      logo_url: logo,
-      card_bg_color: cardBg,
-      card_text_color: cardText,
-      card_accent_color: cardAccent,
       social_links: socialLinks.filter((s) => s.label.trim() && s.url.trim()),
       current_location_address: address,
       is_open_now: isOpen,
@@ -534,23 +523,8 @@ function PopupProfileForm({
                 hint="A second photo of your pop-up."
               />
             </div>
-            <ImageUpload
-              userId={user.id}
-              value={logo}
-              onChange={setLogo}
-              label="Logo"
-              hint="Your pop-up logo (shown on the card)."
-            />
           </>
         )}
-        <div>
-          <Label>Card Colors</Label>
-          <div className="flex items-center gap-1" style={{ flexWrap: "wrap", marginTop: "0.5rem" }}>
-            <ColorField label="Background" value={cardBg} onChange={setCardBg} />
-            <ColorField label="Text" value={cardText} onChange={setCardText} />
-            <ColorField label="Accent" value={cardAccent} onChange={setCardAccent} />
-          </div>
-        </div>
         <div>
           <Label>Current Location Address</Label>
           <Input value={address} onChange={(e) => setAddress(e.target.value)} />
