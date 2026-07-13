@@ -444,13 +444,6 @@ function PopupProfileForm({
   const [description, setDescription] = useState(popup.description || "");
   const [spotPhoto, setSpotPhoto] = useState<string | null>(popup.spot_photo_url);
   const [menuPhoto, setMenuPhoto] = useState<string | null>(popup.menu_photo_url);
-  const p = popup as unknown as {
-    logo_url?: string | null;
-    card_bg_color?: string | null;
-    card_text_color?: string | null;
-    card_accent_color?: string | null;
-  };
-  void p;
   const [address, setAddress] = useState(popup.current_location_address || "");
   const [isOpen, setIsOpen] = useState(popup.is_open_now);
   const [socialLinks, setSocialLinks] = useState<SocialLink[]>(
@@ -542,35 +535,6 @@ function PopupProfileForm({
         </div>
       </CardContent>
     </Card>
-  );
-}
-
-function ColorField({
-  label,
-  value,
-  onChange,
-}: {
-  label: string;
-  value: string;
-  onChange: (v: string) => void;
-}) {
-  return (
-    <label className="flex items-center gap-1" style={{ fontSize: "0.8rem", fontWeight: 700 }}>
-      <input
-        type="color"
-        value={value}
-        onChange={(e) => onChange(e.target.value)}
-        style={{
-          width: 36,
-          height: 36,
-          padding: 0,
-          border: "var(--border-w) solid var(--ink)",
-          background: value,
-          cursor: "pointer",
-        }}
-      />
-      {label}
-    </label>
   );
 }
 
