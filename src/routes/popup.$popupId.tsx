@@ -56,8 +56,7 @@ function PopupDetailPage() {
       </div>
 
       <div className="container stack-lg" style={{ maxWidth: 880, paddingTop: "2rem", paddingBottom: "3rem" }}>
-        <div className="detail-top">
-          <div className="detail-top__main stack-sm">
+        <div className="stack-sm">
             <div>
               <div className="flex items-center gap-1 mb-1" style={{ flexWrap: "wrap" }}>
                 <h1>{truck.name}</h1>
@@ -89,17 +88,19 @@ function PopupDetailPage() {
                 </div>
               </div>
             )}
-          </div>
+        </div>
 
-          <div className="detail-top__media">
-            {truck.spot_photo_url ? (
-              <img src={truck.spot_photo_url} alt={`Where ${truck.name} is parked`} className="detail-img" />
-            ) : (
-              <div className="media-box detail-img">
-                <MapPin size={40} />
-              </div>
-            )}
-          </div>
+        <div className="grid-two">
+          {truck.spot_photo_url ? (
+            <img src={truck.spot_photo_url} alt="" className="detail-img" />
+          ) : (
+            <div className="media-box detail-img" />
+          )}
+          {truck.menu_photo_url ? (
+            <img src={truck.menu_photo_url} alt="" className="detail-img" />
+          ) : (
+            <div className="media-box detail-img" />
+          )}
         </div>
 
         {(() => {
@@ -131,24 +132,6 @@ function PopupDetailPage() {
             </Card>
           );
         })()}
-
-        {truck.menu_photo_url && (
-          <Card>
-            <CardHeader>
-              <CardTitle>
-                <DollarSign size={20} style={{ color: "var(--accent)" }} />
-                More Photos
-              </CardTitle>
-            </CardHeader>
-            <CardContent>
-              <img
-                src={truck.menu_photo_url}
-                alt={`${truck.name}`}
-                style={{ width: "100%", border: "var(--border-w) solid var(--ink)" }}
-              />
-            </CardContent>
-          </Card>
-        )}
 
         <Card>
           <CardHeader>
