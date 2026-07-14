@@ -350,19 +350,20 @@ function ManagePopup({ popup }: { popup: PopupRow }) {
             <TabsTrigger value="menu">Menu</TabsTrigger>
             <TabsTrigger value="schedule">Schedule</TabsTrigger>
           </TabsList>
-          {activeTab === "profile" && (
-            <Button
-              onClick={() => profileSaveRef.current?.save()}
-              disabled={isProfileSaving}
-            >
-              {isProfileSaving ? (
-                <Loader2 size={16} className="spin" />
-              ) : (
-                <Save size={16} />
-              )}
-              Save Changes
-            </Button>
-          )}
+          <Button
+            onClick={() => {
+              setActiveTab("profile");
+              profileSaveRef.current?.save();
+            }}
+            disabled={isProfileSaving}
+          >
+            {isProfileSaving ? (
+              <Loader2 size={16} className="spin" />
+            ) : (
+              <Save size={16} />
+            )}
+            Save Changes
+          </Button>
         </div>
 
         <TabsContent value="profile">
