@@ -262,17 +262,21 @@ function HomePage() {
         )}
       </div>
 
-      <section className="nb-hero" style={{ padding: "3rem 1rem" }}>
-        <div className="container text-center">
-          <h1>Your Pop-Up Card</h1>
-          <p className="nb-hero__lead">
-            Create a shareable card link with your info, menu and live location on google maps so customers can find you instantly.
-          </p>
-          <Link to="/auth" className="nb-btn">
-            Get Your Card
-          </Link>
-        </div>
-      </section>
+      <div className="container" style={{ paddingBottom: "3rem" }}>
+        <Card className="nb-card">
+          <CardContent className="text-center" style={{ padding: "2.5rem 1.5rem" }}>
+            <h2 style={{ fontSize: "1.4rem", textTransform: "uppercase", letterSpacing: "0.02em", marginBottom: "0.75rem" }}>
+              Your Pop-Up Card
+            </h2>
+            <p className="muted" style={{ maxWidth: 640, margin: "0 auto 1.25rem", lineHeight: 1.5 }}>
+              Create a shareable card link with your info, menu and live location on google maps so customers can find you instantly.
+            </p>
+            <Link to="/auth" className="nb-btn">
+              Get Your Card
+            </Link>
+          </CardContent>
+        </Card>
+      </div>
 
       <footer
         style={{
