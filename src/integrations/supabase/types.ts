@@ -19,6 +19,7 @@ export type Database = {
           card_accent_color: string | null
           card_bg_color: string | null
           card_text_color: string | null
+          close_time: string | null
           created_at: string
           cuisine_type: Database["public"]["Enums"]["cuisine_type"]
           current_latitude: number | null
@@ -31,6 +32,7 @@ export type Database = {
           logo_url: string | null
           menu_photo_url: string | null
           name: string
+          open_time: string | null
           owner_id: string
           photo_url: string | null
           slug: string | null
@@ -42,6 +44,7 @@ export type Database = {
           card_accent_color?: string | null
           card_bg_color?: string | null
           card_text_color?: string | null
+          close_time?: string | null
           created_at?: string
           cuisine_type?: Database["public"]["Enums"]["cuisine_type"]
           current_latitude?: number | null
@@ -54,6 +57,7 @@ export type Database = {
           logo_url?: string | null
           menu_photo_url?: string | null
           name: string
+          open_time?: string | null
           owner_id: string
           photo_url?: string | null
           slug?: string | null
@@ -65,6 +69,7 @@ export type Database = {
           card_accent_color?: string | null
           card_bg_color?: string | null
           card_text_color?: string | null
+          close_time?: string | null
           created_at?: string
           cuisine_type?: Database["public"]["Enums"]["cuisine_type"]
           current_latitude?: number | null
@@ -77,6 +82,7 @@ export type Database = {
           logo_url?: string | null
           menu_photo_url?: string | null
           name?: string
+          open_time?: string | null
           owner_id?: string
           photo_url?: string | null
           slug?: string | null
