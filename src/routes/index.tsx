@@ -1,6 +1,7 @@
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
 import { getFoodTrucks, geocodeZip } from "@/lib/food-trucks.functions";
+import { isPopupOpenNow } from "@/lib/popup-open";
 import { useGoogleMaps } from "@/hooks/use-google-maps";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
@@ -49,9 +50,11 @@ function HomePage() {
   const markersRef = useRef<google.maps.Marker[]>([]);
   const infoRef = useRef<google.maps.InfoWindow | null>(null);
 
-  const located = (popups ?? []).filter(
-    (t): t is Located => t.current_latitude != null && t.current_longitude != null
-  );
+  const located = (popups ?? [])
+    .filter((t) => isPopupOpenNow(t))
+    .filter(
+      (t): t is Located => t.current_latitude != null && t.current_longitude != null
+    );
 
   const nearby = center
     ? located

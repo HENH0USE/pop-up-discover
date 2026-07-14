@@ -350,19 +350,20 @@ function ManagePopup({ popup }: { popup: PopupRow }) {
             <TabsTrigger value="menu">Menu</TabsTrigger>
             <TabsTrigger value="schedule">Schedule</TabsTrigger>
           </TabsList>
-          {activeTab === "profile" && (
-            <Button
-              onClick={() => profileSaveRef.current?.save()}
-              disabled={isProfileSaving}
-            >
-              {isProfileSaving ? (
-                <Loader2 size={16} className="spin" />
-              ) : (
-                <Save size={16} />
-              )}
-              Save Changes
-            </Button>
-          )}
+          <Button
+            onClick={() => {
+              setActiveTab("profile");
+              profileSaveRef.current?.save();
+            }}
+            disabled={isProfileSaving}
+          >
+            {isProfileSaving ? (
+              <Loader2 size={16} className="spin" />
+            ) : (
+              <Save size={16} />
+            )}
+            Save Changes
+          </Button>
         </div>
 
         <TabsContent value="profile">
@@ -446,6 +447,13 @@ function PopupProfileForm({
   const [menuPhoto, setMenuPhoto] = useState<string | null>(popup.menu_photo_url);
   const [address, setAddress] = useState(popup.current_location_address || "");
   const [isOpen, setIsOpen] = useState(popup.is_open_now);
+  const [openTime, setOpenTime] = useState(
+    ((popup as { open_time?: string | null }).open_time ?? "").slice(0, 5)
+  );
+  const [closeTime, setCloseTime] = useState(
+    ((popup as { close_time?: string | null }).close_time ?? "").slice(0, 5)
+  );
+  const [timeError, setTimeError] = useState<string | null>(null);
   const [socialLinks, setSocialLinks] = useState<SocialLink[]>(
     parseSocialLinks((popup as { social_links?: unknown }).social_links)
   );
@@ -460,11 +468,22 @@ function PopupProfileForm({
       social_links: SocialLink[];
       current_location_address: string;
       is_open_now: boolean;
+      open_time: string | null;
+      close_time: string | null;
     }) => updateFoodTruck({ data: payload }),
     onSuccess: () => queryClient.invalidateQueries({ queryKey: ["my-popup"] }),
   });
 
   const handleSave = () => {
+    if (!openTime || !closeTime) {
+      setTimeError("Please set today's opening and closing time.");
+      return;
+    }
+    if (closeTime <= openTime) {
+      setTimeError("Closing time must be after opening time.");
+      return;
+    }
+    setTimeError(null);
     updateMutation.mutate({
       id: popup.id,
       name,
@@ -474,6 +493,8 @@ function PopupProfileForm({
       social_links: socialLinks.filter((s) => s.label.trim() && s.url.trim()),
       current_location_address: address,
       is_open_now: isOpen,
+      open_time: openTime,
+      close_time: closeTime,
     });
   };
 
@@ -528,6 +549,35 @@ function PopupProfileForm({
             </p>
           )}
         </div>
+        <div className="grid-two">
+          <div>
+            <Label>Opening Time <span style={{ color: "var(--accent)" }}>*</span></Label>
+            <Input
+              type="time"
+              value={openTime}
+              onChange={(e) => setOpenTime(e.target.value)}
+              required
+            />
+          </div>
+          <div>
+            <Label>Closing Time <span style={{ color: "var(--accent)" }}>*</span></Label>
+            <Input
+              type="time"
+              value={closeTime}
+              onChange={(e) => setCloseTime(e.target.value)}
+              required
+            />
+          </div>
+        </div>
+        <p className="muted" style={{ fontSize: "0.8rem", marginTop: "-0.25rem" }}>
+          Required. Your pop-up is automatically removed from the map after your closing time.
+        </p>
+        {timeError && (
+          <p className="flex items-center gap-1" style={{ fontSize: "0.85rem", color: "var(--accent)" }}>
+            <AlertCircle size={14} />
+            {timeError}
+          </p>
+        )}
         <SocialLinksEditor value={socialLinks} onChange={setSocialLinks} />
         <div className="flex items-center gap-1">
           <Switch checked={isOpen} onCheckedChange={setIsOpen} id="open-toggle" />
