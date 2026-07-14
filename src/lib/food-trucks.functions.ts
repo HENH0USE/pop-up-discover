@@ -316,6 +316,8 @@ export const updateFoodTruck = createServerFn({ method: "POST" })
         current_longitude: z.number().nullable().optional(),
         current_location_address: z.string().optional(),
         is_open_now: z.boolean().optional(),
+        open_time: z.string().regex(/^\d{2}:\d{2}(:\d{2})?$/).nullable().optional(),
+        close_time: z.string().regex(/^\d{2}:\d{2}(:\d{2})?$/).nullable().optional(),
       })
       .parse(input)
   )
@@ -370,6 +372,8 @@ export const updateFoodTruck = createServerFn({ method: "POST" })
     if (data.current_latitude !== undefined) updateData.current_latitude = data.current_latitude ?? null;
     if (data.current_longitude !== undefined) updateData.current_longitude = data.current_longitude ?? null;
     if (data.is_open_now !== undefined) updateData.is_open_now = data.is_open_now;
+    if (data.open_time !== undefined) (updateData as Record<string, unknown>).open_time = data.open_time || null;
+    if (data.close_time !== undefined) (updateData as Record<string, unknown>).close_time = data.close_time || null;
 
     const { data: result, error } = await supabase
       .from("food_trucks")
