@@ -1,6 +1,7 @@
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
 import { getFoodTrucks, getFoodTruck } from "@/lib/food-trucks.functions";
+import { isPopupOpenNow } from "@/lib/popup-open";
 import { useGoogleMaps } from "@/hooks/use-google-maps";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -38,10 +39,12 @@ function MapPage() {
     enabled: !!focusId,
   });
 
-  const located = (popups ?? []).filter(
-    (t): t is Popup & { current_latitude: number; current_longitude: number } =>
-      t.current_latitude != null && t.current_longitude != null
-  );
+  const located = (popups ?? [])
+    .filter((t) => isPopupOpenNow(t))
+    .filter(
+      (t): t is Popup & { current_latitude: number; current_longitude: number } =>
+        t.current_latitude != null && t.current_longitude != null
+    );
   const visible = openOnly ? located.filter((t) => t.is_open_now) : located;
 
   useEffect(() => {
