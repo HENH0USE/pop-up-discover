@@ -209,36 +209,33 @@ function HomePage() {
           </CardContent>
         </Card>
 
-        <Card style={{ overflow: "hidden" }}>
-          <CardContent className="nb-card__content--flush relative">
-            <div ref={mapEl} className="map-canvas" />
+      </div>
 
-            {(mapError || (!isLoaded && !mapError)) && (
-              <div className="map-overlay">
-                {mapError ? (
-                  <div className="text-center muted" style={{ padding: "0 1rem" }}>
-                    <AlertCircle size={32} style={{ color: "var(--closed)", margin: "0 auto 0.5rem" }} />
-                    <p>Map could not load. {mapError}</p>
-                  </div>
-                ) : (
-                  <Loader2 size={32} className="spin muted" />
-                )}
+      <div className="relative" style={{ width: "100%" }}>
+        <div ref={mapEl} className="map-canvas" style={{ height: "60vh" }} />
+        {(mapError || (!isLoaded && !mapError)) && (
+          <div className="map-overlay">
+            {mapError ? (
+              <div className="text-center muted" style={{ padding: "0 1rem" }}>
+                <AlertCircle size={32} style={{ color: "var(--closed)", margin: "0 auto 0.5rem" }} />
+                <p>Map could not load. {mapError}</p>
               </div>
+            ) : (
+              <Loader2 size={32} className="spin muted" />
             )}
-
-            {isLoaded && !mapError && !center && (
-              <div className="map-overlay" style={{ pointerEvents: "none" }}>
-                <div className="text-center muted" style={{ padding: "0 1rem" }}>
-                  <MapPin size={32} style={{ margin: "0 auto 0.5rem" }} />
-                  <p style={{ fontWeight: 700 }}>Enter your area code to start</p>
-                  <p style={{ fontSize: "0.9rem" }}>
-                    We'll show every Pop-Up around your community.
-                  </p>
-                </div>
-              </div>
-            )}
-          </CardContent>
-        </Card>
+          </div>
+        )}
+        {isLoaded && !mapError && !center && (
+          <div className="map-overlay" style={{ pointerEvents: "none" }}>
+            <div className="text-center muted" style={{ padding: "0 1rem" }}>
+              <MapPin size={32} style={{ margin: "0 auto 0.5rem" }} />
+              <p style={{ fontWeight: 700 }}>Enter your area code to start</p>
+              <p style={{ fontSize: "0.9rem" }}>
+                We'll show every Pop-Up around your community.
+              </p>
+            </div>
+          </div>
+        )}
       </div>
 
       <div className="container" style={{ paddingTop: "2rem", paddingBottom: "3rem" }}>
@@ -307,48 +304,17 @@ function PopupCard({
     description: string | null;
     current_location_address: string | null;
     is_open_now: boolean;
-    logo_url?: string | null;
-    card_bg_color?: string | null;
-    card_text_color?: string | null;
-    card_accent_color?: string | null;
   };
   dist: number;
 }) {
-  const bg = popup.card_bg_color || undefined;
-  const text = popup.card_text_color || undefined;
-  const accent = popup.card_accent_color || undefined;
   return (
     <Link to="/popup/$popupId" params={{ popupId: popup.id }}>
-      <Card
-        className="nb-card--link"
-        style={{
-          overflow: "hidden",
-          background: bg,
-          color: text,
-          ...(accent ? ({ ["--accent" as string]: accent } as React.CSSProperties) : {}),
-        }}
-      >
+      <Card className="nb-card--link" style={{ overflow: "hidden" }}>
         <div className="media-box relative">
           {popup.spot_photo_url ? (
             <img src={popup.spot_photo_url} alt={popup.name} loading="lazy" />
           ) : (
             <MapPin size={32} />
-          )}
-          {popup.logo_url && (
-            <img
-              src={popup.logo_url}
-              alt={`${popup.name} logo`}
-              style={{
-                position: "absolute",
-                bottom: 8,
-                left: 8,
-                width: 44,
-                height: 44,
-                objectFit: "cover",
-                border: "var(--border-w) solid var(--ink)",
-                background: "#fff",
-              }}
-            />
           )}
           <Badge
             variant={popup.is_open_now ? "open" : "closed"}
