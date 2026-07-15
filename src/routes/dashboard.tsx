@@ -38,6 +38,7 @@ import {
 } from "lucide-react";
 import type { Database } from "@/integrations/supabase/types";
 import { ImageUpload } from "@/components/ImageUpload";
+import { isPopupOpenNow } from "@/lib/popup-open";
 
 const DAYS = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"];
 
