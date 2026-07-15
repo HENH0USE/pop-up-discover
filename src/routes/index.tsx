@@ -311,7 +311,6 @@ function PopupCard({
     description: string | null;
     current_location_address: string | null;
     is_open_now: boolean;
-    menu_photos?: string[] | null;
   };
   dist: number;
 }) {
@@ -348,28 +347,6 @@ function PopupCard({
             <p className="clamp-2 mt-1" style={{ fontSize: "0.85rem", opacity: 0.8 }}>
               {popup.description}
             </p>
-          )}
-          {popup.menu_photos && popup.menu_photos.length > 0 && (
-            <div className="flex items-center gap-1 mt-2" style={{ gap: 6, flexWrap: "wrap" }}>
-              {popup.menu_photos.map((src, i) => (
-                <img
-                  key={i}
-                  src={src}
-                  alt=""
-                  loading="lazy"
-                  decoding="async"
-                  width={48}
-                  height={48}
-                  style={{
-                    width: 48,
-                    height: 48,
-                    objectFit: "cover",
-                    borderRadius: 6,
-                    border: "2px solid var(--ink, #000)",
-                  }}
-                />
-              ))}
-            </div>
           )}
         </CardContent>
       </Card>
