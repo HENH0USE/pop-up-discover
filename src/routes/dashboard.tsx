@@ -590,6 +590,7 @@ function PopupProfileForm({
 
 function MenuManager({ popupId }: { popupId: string }) {
   const queryClient = useQueryClient();
+  const { user } = useAuth();
   const { data, isLoading } = useQuery({
     queryKey: ["pop-up", popupId],
     queryFn: () => getFoodTruck({ data: { id: popupId } }),
@@ -598,6 +599,7 @@ function MenuManager({ popupId }: { popupId: string }) {
   const [name, setName] = useState("");
   const [desc, setDesc] = useState("");
   const [price, setPrice] = useState("");
+  const [photo, setPhoto] = useState<string | null>(null);
 
   const createMutation = useMutation({
     mutationFn: async (payload: {
@@ -605,12 +607,14 @@ function MenuManager({ popupId }: { popupId: string }) {
       name: string;
       description: string;
       price: number;
+      photo_url: string;
     }) => createMenuItem({ data: payload }),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["pop-up", popupId] });
       setName("");
       setDesc("");
       setPrice("");
+      setPhoto(null);
     },
   });
 
@@ -628,6 +632,7 @@ function MenuManager({ popupId }: { popupId: string }) {
       name,
       description: desc,
       price: numPrice,
+      photo_url: photo ?? "",
     });
   };
 
@@ -646,14 +651,40 @@ function MenuManager({ popupId }: { popupId: string }) {
           ) : (
             <div className="stack-xs">
               {data?.menuItems.length === 0 && <p className="muted">No menu items yet.</p>}
-              {data?.menuItems.map((item) => (
+              {data?.menuItems.map((item: {
+                id: string;
+                name: string;
+                description: string | null;
+                price: number;
+                photo_url: string | null;
+              }) => (
                 <div key={item.id} className="nb-tile flex items-center justify-between">
-                  <div>
-                    <p style={{ fontWeight: 700 }}>{item.name}</p>
-                    {item.description && <p className="muted" style={{ fontSize: "0.85rem" }}>{item.description}</p>}
-                    <p style={{ fontWeight: 700, color: "var(--accent)", fontSize: "0.9rem" }}>
-                      ${item.price.toFixed(2)}
-                    </p>
+                  <div className="flex items-center gap-1" style={{ gap: 12 }}>
+                    {item.photo_url && (
+                      <img
+                        src={item.photo_url}
+                        alt={item.name}
+                        loading="lazy"
+                        decoding="async"
+                        width={56}
+                        height={56}
+                        style={{
+                          width: 56,
+                          height: 56,
+                          objectFit: "cover",
+                          borderRadius: 6,
+                          border: "2px solid var(--ink, #000)",
+                          flexShrink: 0,
+                        }}
+                      />
+                    )}
+                    <div>
+                      <p style={{ fontWeight: 700 }}>{item.name}</p>
+                      {item.description && <p className="muted" style={{ fontSize: "0.85rem" }}>{item.description}</p>}
+                      <p style={{ fontWeight: 700, color: "var(--accent)", fontSize: "0.9rem" }}>
+                        ${item.price.toFixed(2)}
+                      </p>
+                    </div>
                   </div>
                   <Button
                     variant="ghost"
@@ -700,6 +731,17 @@ function MenuManager({ popupId }: { popupId: string }) {
               <Label>Description</Label>
               <Input value={desc} onChange={(e) => setDesc(e.target.value)} placeholder="Optional" />
             </div>
+            {user && (
+              <div style={{ gridColumn: "span 4" }}>
+                <ImageUpload
+                  value={photo}
+                  onChange={setPhoto}
+                  userId={user.id}
+                  label="Photo (optional)"
+                  hint="One photo per item. Keep it under 5MB for fast loads."
+                />
+              </div>
+            )}
             <Button type="submit" disabled={createMutation.isPending}>
               <Plus size={16} /> Add
             </Button>
