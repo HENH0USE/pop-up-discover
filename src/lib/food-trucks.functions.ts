@@ -276,7 +276,16 @@ export const createFoodTruck = createServerFn({ method: "POST" })
         spot_photo_url: z.string().optional(),
         menu_photo_url: z.string().optional(),
         social_links: z
-          .array(z.object({ label: z.string().min(1).max(50), url: z.string().url() }))
+          .array(
+            z.object({
+              label: z.string().min(1).max(50),
+              url: z
+                .string()
+                .min(1)
+                .transform((v) => (/^https?:\/\//i.test(v) ? v : `https://${v}`))
+                .pipe(z.string().url()),
+            })
+          )
           .optional(),
         current_latitude: z.number().nullable().optional(),
         current_longitude: z.number().nullable().optional(),
@@ -338,7 +347,16 @@ export const updateFoodTruck = createServerFn({ method: "POST" })
         card_text_color: z.string().nullable().optional(),
         card_accent_color: z.string().nullable().optional(),
         social_links: z
-          .array(z.object({ label: z.string().min(1).max(50), url: z.string().url() }))
+          .array(
+            z.object({
+              label: z.string().min(1).max(50),
+              url: z
+                .string()
+                .min(1)
+                .transform((v) => (/^https?:\/\//i.test(v) ? v : `https://${v}`))
+                .pipe(z.string().url()),
+            })
+          )
           .optional(),
         current_latitude: z.number().nullable().optional(),
         current_longitude: z.number().nullable().optional(),
