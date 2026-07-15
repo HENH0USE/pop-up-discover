@@ -218,7 +218,8 @@ export const getFoodTruck = createServerFn({ method: "GET" })
     if (schedError) throw schedError;
 
     const [signedTruck] = await withSignedPhotos([truck]);
-    return { truck: signedTruck, menuItems: menuItems ?? [], schedules: schedules ?? [] };
+    const signedMenu = await signMenuPhotos(menuItems ?? []);
+    return { truck: signedTruck, menuItems: signedMenu, schedules: schedules ?? [] };
   });
 
 // Authenticated: get current user's truck
