@@ -60,6 +60,33 @@ async function withSignedPhotos<T extends PhotoFields>(trucks: T[]): Promise<T[]
   }));
 }
 
+async function signMenuPhotos<T extends { photo_url: string | null }>(items: T[]): Promise<T[]> {
+  const paths = Array.from(
+    new Set(
+      items
+        .map((i) => i.photo_url)
+        .filter((p): p is string => !!p && !/^https?:\/\//i.test(p))
+    )
+  );
+  if (paths.length === 0) return items;
+  const supabase = createPublicClient();
+  const { data } = await supabase.storage
+    .from("truck-photos")
+    .createSignedUrls(paths, 3600);
+  const map = new Map<string, string>();
+  for (const item of data ?? []) {
+    if (item.signedUrl && item.path) map.set(item.path, item.signedUrl);
+  }
+  return items.map((i) => ({
+    ...i,
+    photo_url: i.photo_url
+      ? /^https?:\/\//i.test(i.photo_url)
+        ? i.photo_url
+        : (map.get(i.photo_url) ?? null)
+      : null,
+  }));
+}
+
 // Public: list all active food trucks
 export const getFoodTrucks = createServerFn({ method: "GET" }).handler(
   async () => {
