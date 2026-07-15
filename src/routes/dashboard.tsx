@@ -38,6 +38,7 @@ import {
 } from "lucide-react";
 import type { Database } from "@/integrations/supabase/types";
 import { ImageUpload } from "@/components/ImageUpload";
+import { isPopupOpenNow } from "@/lib/popup-open";
 
 const DAYS = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"];
 
@@ -576,6 +577,12 @@ function PopupProfileForm({
           <p className="flex items-center gap-1" style={{ fontSize: "0.85rem", color: "var(--accent)" }}>
             <AlertCircle size={14} />
             {timeError}
+          </p>
+        )}
+        {openTime && closeTime && isOpen && !isPopupOpenNow({ is_open_now: true, open_time: openTime, close_time: closeTime }) && (
+          <p className="flex items-center gap-1" style={{ fontSize: "0.85rem", color: "var(--accent)" }}>
+            <AlertCircle size={14} />
+            The current time is outside your open hours, so your pop-up will not appear on the map right now.
           </p>
         )}
         <SocialLinksEditor value={socialLinks} onChange={setSocialLinks} />
