@@ -423,7 +423,7 @@ export const createMenuItem = createServerFn({ method: "POST" })
         name: z.string().min(1).max(100),
         description: z.string().max(300).optional(),
         price: z.number().positive(),
-        photo_url: z.string().url().optional().or(z.literal("")),
+        photo_url: z.string().optional().or(z.literal("")),
       })
       .parse(input)
   )
