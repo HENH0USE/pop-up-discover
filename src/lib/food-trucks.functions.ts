@@ -97,7 +97,23 @@ export const getFoodTrucks = createServerFn({ method: "GET" }).handler(
       .eq("is_active", true)
       .order("name");
     if (error) throw error;
-    return withSignedPhotos(data ?? []);
+    const trucks = await withSignedPhotos(data ?? []);
+    const truckIds = trucks.map((t) => t.id);
+    if (truckIds.length === 0) return trucks.map((t) => ({ ...t, menu_photos: [] as string[] }));
+    const { data: items } = await supabase
+      .from("menu_items")
+      .select("truck_id, photo_url")
+      .in("truck_id", truckIds)
+      .not("photo_url", "is", null);
+    const signed = await signMenuPhotos(items ?? []);
+    const byTruck = new Map<string, string[]>();
+    for (const it of signed) {
+      if (!it.photo_url) continue;
+      const arr = byTruck.get(it.truck_id) ?? [];
+      if (arr.length < 4) arr.push(it.photo_url);
+      byTruck.set(it.truck_id, arr);
+    }
+    return trucks.map((t) => ({ ...t, menu_photos: byTruck.get(t.id) ?? [] }));
   }
 );
 
