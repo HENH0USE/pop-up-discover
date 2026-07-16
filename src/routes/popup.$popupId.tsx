@@ -147,6 +147,21 @@ function PopupDetailPage() {
               <div className="grid-two">
                 {menuItems.map((item) => (
                   <div key={item.id} className="nb-tile">
+                    {item.photo_url && (
+                      <img
+                        src={item.photo_url}
+                        alt={item.name}
+                        loading="lazy"
+                        style={{
+                          width: "100%",
+                          aspectRatio: "4 / 3",
+                          objectFit: "cover",
+                          borderRadius: 8,
+                          marginBottom: 8,
+                          display: "block",
+                        }}
+                      />
+                    )}
                     <div className="flex justify-between items-start mb-1">
                       <p style={{ fontWeight: 700 }}>{item.name}</p>
                       <span style={{ fontWeight: 700, color: "var(--accent)" }}>
