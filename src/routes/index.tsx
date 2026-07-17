@@ -56,13 +56,17 @@ function HomePage() {
           gsap.set("[data-anim]", { opacity: 1, y: 0 });
           return;
         }
+        gsap.set("[data-anim='hero-title']", { y: 24 });
+        gsap.set("[data-anim='hero-lead']", { y: 16 });
+        gsap.set("[data-anim='hero-cta']", { y: 12 });
+        gsap.set("[data-anim='stagger']", { y: 20 });
         const tl = gsap.timeline({ defaults: { ease: "power3.out" } });
-        tl.from("[data-anim='hero-title']", { opacity: 0, y: 24, duration: dur })
-          .from("[data-anim='hero-lead']", { opacity: 0, y: 16, duration: dur }, "-=0.35")
-          .from("[data-anim='hero-cta']", { opacity: 0, y: 12, duration: dur }, "-=0.4")
-          .from(
+        tl.to("[data-anim='hero-title']", { opacity: 1, y: 0, duration: dur })
+          .to("[data-anim='hero-lead']", { opacity: 1, y: 0, duration: dur }, "-=0.35")
+          .to("[data-anim='hero-cta']", { opacity: 1, y: 0, duration: dur }, "-=0.4")
+          .to(
             "[data-anim='stagger']",
-            { opacity: 0, y: 20, duration: dur, stagger: 0.12 },
+            { opacity: 1, y: 0, duration: dur, stagger: 0.12 },
             "-=0.3",
           );
         if (!narrow) {
