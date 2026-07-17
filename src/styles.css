@@ -29,3 +29,5 @@
 @media (prefers-reduced-motion: reduce) {
   .hover-lift, .hover-lift:hover, .hover-lift:hover svg { transform: none; transition: none; }
 }
+[data-anim='hero-title'],[data-anim='hero-lead'],[data-anim='hero-cta'],[data-anim='stagger']{opacity:0}
+@media (prefers-reduced-motion: reduce){[data-anim]{opacity:1 !important}}
