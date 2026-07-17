@@ -9,6 +9,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Loader2, MapPin, Search, Navigation, AlertCircle } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
+import logoUrl from "@/assets/logo.png";
 
 export const Route = createFileRoute("/")({
   component: HomePage,
@@ -216,11 +217,27 @@ function HomePage() {
     <div className="page" ref={rootRef}>
       <section className="nb-hero">
         <div className="container text-center">
+          <img
+            src={logoUrl}
+            alt=""
+            data-anim="hero-mark"
+            width={96}
+            height={96}
+            decoding="async"
+            style={{
+              width: 96,
+              height: 96,
+              margin: "0 auto 1rem",
+              display: "block",
+              willChange: "transform",
+            }}
+          />
           <h1 className="nb-hero-gsap" data-anim="hero-title">List Your Pop-Up Live</h1>
           <p className="nb-hero__lead" data-anim="hero-lead">
             Sign up as a vendor and start bringing people to your next drop.
           </p>
           <Link to="/auth" className="nb-btn hover-lift" data-anim="hero-cta">
+            <img src={logoUrl} alt="" width={18} height={18} decoding="async" style={{ display: "inline-block" }} />
             Sign Up
           </Link>
         </div>
@@ -322,6 +339,7 @@ function HomePage() {
               Create a shareable card link with your info, menu and live location on google maps so customers can find you instantly.
             </p>
             <Link to="/auth" className="nb-btn hover-lift">
+              <img src={logoUrl} alt="" width={18} height={18} decoding="async" style={{ display: "inline-block" }} />
               Get Your Card
             </Link>
           </CardContent>
@@ -337,7 +355,18 @@ function HomePage() {
         }}
       >
         <div className="container">
-          <p style={{ fontWeight: 700, marginBottom: "0.5rem" }}>Pop-Up Live</p>
+          <p style={{ fontWeight: 700, marginBottom: "0.5rem", display: "inline-flex", alignItems: "center", gap: "0.5rem" }}>
+            <img
+              src={logoUrl}
+              alt=""
+              width={24}
+              height={24}
+              decoding="async"
+              loading="lazy"
+              style={{ filter: "invert(1)" }}
+            />
+            Pop-Up Live
+          </p>
           <p style={{ fontSize: "0.85rem", opacity: 0.8 }}>
             &copy; {new Date().getFullYear()} Pop-Up Live. Bringing local vendors to your community.
           </p>
