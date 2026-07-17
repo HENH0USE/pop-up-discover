@@ -274,7 +274,7 @@ function HomePage() {
         {isLoaded && !mapError && !center && (
           <div className="map-overlay" style={{ pointerEvents: "none" }}>
             <div className="text-center muted" style={{ padding: "0 1rem" }}>
-              <MapPin size={32} style={{ margin: "0 auto 0.5rem" }} />
+              <MapPin size={32} style={{ margin: "0 auto 0.5rem" }} data-anim="bounce" />
               <p style={{ fontWeight: 700 }}>Enter your area code to start</p>
               <p style={{ fontSize: "0.9rem" }}>
                 We'll show every Pop-Up around your community.
@@ -309,7 +309,7 @@ function HomePage() {
       </div>
 
       <div className="container" style={{ paddingBottom: "3rem" }}>
-        <Card className="nb-card">
+        <Card className="nb-card" data-anim="stagger">
           <CardContent className="text-center" style={{ padding: "2.5rem 1.5rem" }}>
             <h2 style={{ fontSize: "1.4rem", textTransform: "uppercase", letterSpacing: "0.02em", marginBottom: "0.75rem" }}>
               Your Pop-Up Card
@@ -317,7 +317,7 @@ function HomePage() {
             <p className="muted" style={{ maxWidth: 640, margin: "0 auto 1.25rem", lineHeight: 1.5 }}>
               Create a shareable card link with your info, menu and live location on google maps so customers can find you instantly.
             </p>
-            <Link to="/auth" className="nb-btn">
+            <Link to="/auth" className="nb-btn hover-lift">
               Get Your Card
             </Link>
           </CardContent>
