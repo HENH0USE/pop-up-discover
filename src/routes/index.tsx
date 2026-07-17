@@ -38,6 +38,49 @@ function HomePage() {
   const [center, setCenter] = useState<{ lat: number; lng: number; address: string } | null>(null);
   const [geoError, setGeoError] = useState<string | null>(null);
   const [searching, setSearching] = useState(false);
+  const rootRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+    const reduce = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    const narrow = window.innerWidth < 480;
+    const root = rootRef.current;
+    if (!root) return;
+    let ctx: { revert: () => void } | null = null;
+    let cancelled = false;
+    import("gsap").then(({ gsap }) => {
+      if (cancelled || !root) return;
+      ctx = gsap.context(() => {
+        const dur = narrow ? 0.35 : 0.6;
+        if (reduce) {
+          gsap.set("[data-anim]", { opacity: 1, y: 0 });
+          return;
+        }
+        const tl = gsap.timeline({ defaults: { ease: "power3.out" } });
+        tl.from("[data-anim='hero-title']", { opacity: 0, y: 24, duration: dur })
+          .from("[data-anim='hero-lead']", { opacity: 0, y: 16, duration: dur }, "-=0.35")
+          .from("[data-anim='hero-cta']", { opacity: 0, y: 12, duration: dur }, "-=0.4")
+          .from(
+            "[data-anim='stagger']",
+            { opacity: 0, y: 20, duration: dur, stagger: 0.12 },
+            "-=0.3",
+          );
+        if (!narrow) {
+          gsap.to("[data-anim='bounce']", {
+            y: -3,
+            duration: 1.6,
+            ease: "sine.inOut",
+            yoyo: true,
+            repeat: -1,
+          });
+        }
+      }, root);
+    });
+    return () => {
+      cancelled = true;
+      ctx?.revert();
+    };
+  }, []);
 
   const { data: popups } = useQuery({
     queryKey: ["pop-ups"],
@@ -166,21 +209,21 @@ function HomePage() {
   }, [maps, center, nearby, navigate]);
 
   return (
-    <div className="page">
+    <div className="page" ref={rootRef}>
       <section className="nb-hero">
         <div className="container text-center">
-          <h1 className="nb-hero-gsap">List Your Pop-Up Live</h1>
-          <p className="nb-hero__lead">
+          <h1 className="nb-hero-gsap" data-anim="hero-title">List Your Pop-Up Live</h1>
+          <p className="nb-hero__lead" data-anim="hero-lead">
             Sign up as a vendor and start bringing people to your next drop.
           </p>
-          <Link to="/auth" className="nb-btn">
+          <Link to="/auth" className="nb-btn hover-lift" data-anim="hero-cta">
             Sign Up
           </Link>
         </div>
       </section>
 
       <div className="container stack-lg" style={{ paddingTop: "2rem", paddingBottom: "3rem" }}>
-        <Card className="nb-card">
+        <Card className="nb-card" data-anim="stagger">
           <CardContent className="text-center" style={{ padding: "2.5rem 1.5rem" }}>
             <h2 style={{ fontSize: "1.4rem", textTransform: "uppercase", letterSpacing: "0.02em", marginBottom: "0.75rem" }}>
               Find local vendors support your community
